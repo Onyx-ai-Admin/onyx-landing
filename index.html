@@ -596,7 +596,11 @@ footer .fcol a:hover{opacity:1}
   // 2) The count then comes from the sheet (persistent, shared, never resets).
   //    Until a real URL is set — and inside the claude.ai preview, which blocks
   //    external requests — it falls back to a local, per-browser count.
-  var WEBAPP_URL = 'https://script.google.com/a/macros/onyx-tech.ai/s/AKfycbz6_az9hkJRtKfUMEkbgZr8fZB8ohI4lexcDWvxCt6HqS91_p98kko88HuyiElQi9UH/exec';
+  // The deployment that writes Attribution. The previous one still accepts signups
+  // but silently drops the referrer - a deployment serves the code version it was
+  // cut at, so editing Apps Script does nothing until a NEW VERSION of THIS
+  // deployment is published. Verified 2026-09-02 by posting to both.
+  var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwgQGqmlgWKAfAOpV0NFifGjs64wF0F7W4XVUyWarqC93PWPIbX6QVgu7yvdblnrboY/exec';
   var WL_BASE=17, WL_KEY='onyx_wl_count';
 
   // ── Referral attribution ───────────────────────────────────────────────────
@@ -638,6 +642,24 @@ footer .fcol a:hover{opacity:1}
     })); }catch(e){}
   }
   captureRef();
+
+  // How a referrer's code is written down for a human.
+  //
+  // The code itself stays lowercase so ?ref=Enrique, ?ref=ENRIQUE and ?ref=enrique
+  // are all one partner - matching must never depend on how someone typed a link.
+  // What lands in the sheet is the readable form, because a column of lowercase
+  // first names is something Sehaj would end up fixing by hand every week.
+  var REF_NAMES = { enrique: 'Enrique' };
+
+  function refDisplayName(code){
+    if(REF_NAMES[code]) return REF_NAMES[code];
+    // Anything not named above: split on - and _ and capitalise each word, so a
+    // new partner reads properly the day their link goes out rather than the day
+    // someone remembers to add them here.
+    return code.split(/[-_]+/).filter(Boolean)
+      .map(function(w){ return w.charAt(0).toUpperCase()+w.slice(1) })
+      .join(' ');
+  }
   var liveMode = WEBAPP_URL.indexOf('http')===0;
 
   function wlCached(){var v=parseInt(localStorage.getItem(WL_KEY),10);return (isNaN(v)||v<WL_BASE)?WL_BASE:v;}
@@ -713,7 +735,7 @@ footer .fcol a:hover{opacity:1}
       // must never break because attribution changed.
       var ref=readRef();
       if(ref){
-        payload.ref=ref.code;
+        payload.ref=refDisplayName(ref.code);
         if(ref.campaign) payload.campaign=ref.campaign;
         if(ref.medium) payload.medium=ref.medium;
         payload.refAt=new Date(ref.at).toISOString();
