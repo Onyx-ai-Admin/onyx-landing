@@ -752,6 +752,21 @@ footer .fcol a:hover{opacity:1}
         errEl.textContent=m||'Something went wrong. Please try again.'; errEl.hidden=false;
       }
 
+      // Record the referral in Onyx as well as the sheet. Fire-and-forget and never
+      // awaited: the sheet is what the signup DEPENDS on, and a partner's click count is
+      // not worth risking somebody's place in the queue over. `keepalive` so it still
+      // goes if the thanks screen navigates immediately after.
+      if(ref && liveMode){
+        try{
+          fetch('https://os.onyx-tech.ai/api/affiliate/referral',{
+            method:'POST',
+            headers:{'Content-Type':'text/plain;charset=utf-8'}, // simple request, no preflight
+            body:JSON.stringify({ ref: ref.code, email: payload.email, name: payload.name, business: payload.business }),
+            keepalive:true
+          }).catch(function(){});
+        }catch(e){}
+      }
+
       if(liveMode){
         fetch(WEBAPP_URL,{
           method:'POST',
