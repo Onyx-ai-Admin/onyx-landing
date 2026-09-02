@@ -598,6 +598,46 @@ footer .fcol a:hover{opacity:1}
   //    external requests — it falls back to a local, per-browser count.
   var WEBAPP_URL = 'https://script.google.com/a/macros/onyx-tech.ai/s/AKfycbz6_az9hkJRtKfUMEkbgZr8fZB8ohI4lexcDWvxCt6HqS91_p98kko88HuyiElQi9UH/exec';
   var WL_BASE=17, WL_KEY='onyx_wl_count';
+
+  // ── Referral attribution ───────────────────────────────────────────────────
+  // An affiliate sends someone here as ?ref=their-code. The code is REMEMBERED
+  // rather than read at submit time, because almost nobody signs up on the first
+  // pageview: they land, read, leave, and come back later from a bookmark or a
+  // search - and by then the URL has no ?ref on it. Without this the partner who
+  // actually sent them gets no credit, which is the whole point of the link.
+  //
+  // 90 days, first-touch. First-touch on purpose: the person who INTRODUCED
+  // Onyx earned it, and last-touch would quietly hand the credit to whoever the
+  // customer happened to click most recently.
+  var REF_KEY='onyx_ref', REF_TTL=90*24*60*60*1000;
+
+  function readRef(){
+    try{
+      var raw=localStorage.getItem(REF_KEY); if(!raw) return null;
+      var saved=JSON.parse(raw);
+      if(!saved || !saved.code) return null;
+      if(saved.at && (Date.now()-saved.at)>REF_TTL){ localStorage.removeItem(REF_KEY); return null; }
+      return saved;
+    }catch(e){ return null; }
+  }
+
+  function captureRef(){
+    var params=new URLSearchParams(location.search);
+    // `ref` is ours; `via` and `utm_source` are what partners paste out of habit.
+    var code=params.get('ref')||params.get('via')||params.get('utm_source')||'';
+    // Codes are ours to issue, so anything unexpected is a typo or someone poking
+    // at it - trimmed hard rather than trusted into a spreadsheet cell.
+    code=code.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,40);
+    if(!code) return;
+    if(readRef()) return;                    // first touch wins
+    try{ localStorage.setItem(REF_KEY, JSON.stringify({
+      code: code,
+      at: Date.now(),
+      campaign: (params.get('utm_campaign')||'').trim().slice(0,60),
+      medium: (params.get('utm_medium')||'').trim().slice(0,40)
+    })); }catch(e){}
+  }
+  captureRef();
   var liveMode = WEBAPP_URL.indexOf('http')===0;
 
   function wlCached(){var v=parseInt(localStorage.getItem(WL_KEY),10);return (isNaN(v)||v<WL_BASE)?WL_BASE:v;}
@@ -667,6 +707,17 @@ footer .fcol a:hover{opacity:1}
       if(btn){ btn.disabled=true; btn.textContent='Joining…'; }
 
       var payload={ name:name.value.trim(), business:biz.value.trim(), phone:document.getElementById('wlCountry').value+' '+phone.value.trim(), email:email.value.trim().toLowerCase() };
+
+      // Who sent them. Sent as extra fields, so an Apps Script that has not been
+      // updated yet simply ignores them and the signup still lands - the form
+      // must never break because attribution changed.
+      var ref=readRef();
+      if(ref){
+        payload.ref=ref.code;
+        if(ref.campaign) payload.campaign=ref.campaign;
+        if(ref.medium) payload.medium=ref.medium;
+        payload.refAt=new Date(ref.at).toISOString();
+      }
 
       function finish(n){                       // success → thanks page
         wlStore(n); wlShow(n);
