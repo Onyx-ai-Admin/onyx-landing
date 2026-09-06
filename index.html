@@ -105,7 +105,11 @@ header.nav.scrolled{background:var(--ground)}
   header.nav,header.nav.scrolled{position:static;background:transparent;backdrop-filter:none;border-bottom-color:transparent}
 }
 header.nav.scrolled{border-bottom-color:var(--line)}
-.nav-in{display:flex;align-items:center;justify-content:center;height:64px}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:64px;gap:1.5rem}
+.nav-links{display:flex;gap:clamp(1.1rem,2.5vw,2rem);list-style:none;margin:0;padding:0}
+.nav-links a{font-family:var(--body);font-size:.87rem;color:var(--muted);text-decoration:none;transition:color .15s ease}
+.nav-links a:hover{color:var(--text)}
+@media(max-width:640px){.nav-links{display:none}}
 .wordmark{font-family:var(--display);font-weight:700;font-size:1.35rem;letter-spacing:-0.04em;text-decoration:none;color:var(--text)}
 .wordmark .x{color:var(--accent)}
 .nav-links{display:flex;gap:2rem;align-items:center}
@@ -148,7 +152,7 @@ header.nav.scrolled{border-bottom-color:var(--line)}
 /* centered single-fold hero (kinso-style format) */
 /* pulled up under the transparent nav so the block centres on the true viewport
    centre rather than the centre of the space below the bar */
-.hero{min-height:100dvh;margin-top:calc(-64px - env(safe-area-inset-top,0px));display:grid;place-items:center;padding:clamp(.75rem,2.5vh,2rem) 0}
+.hero{min-height:100dvh;display:grid;place-items:center;padding:clamp(.75rem,2.5vh,2rem) 0}
 .hero-inner{width:min(720px,92vw);margin-inline:auto;text-align:center;display:flex;flex-direction:column;align-items:center}
 .hero-inner .eyebrow{font-size:.8rem}
 .hero-inner h1{font-size:clamp(2.4rem,6vw,4.1rem);margin-top:1.25rem;max-width:16ch}
@@ -172,7 +176,7 @@ body.route-join{overflow:hidden;height:100dvh}
 body.route-join #top{display:none}
 /* centred on the full viewport: nav sits in flow above, so pull up by its height
    plus the status-bar inset or the block lands low by half the nav */
-body.route-join .join-view{display:grid;place-items:center;min-height:100dvh;margin-top:calc(-64px - env(safe-area-inset-top,0px));padding:clamp(1rem,4vh,3rem) 0}
+body.route-join .join-view{display:grid;place-items:center;min-height:100dvh;padding:clamp(1rem,4vh,3rem) 0}
 body.route-join .nav-cta{visibility:hidden}
 .join-inner{width:min(560px,92vw);margin-inline:auto;text-align:center;display:flex;flex-direction:column;align-items:center;position:relative}
 .join-back{align-self:center;font-family:var(--mono);font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-decoration:none;margin-bottom:3.3rem}
@@ -193,7 +197,7 @@ body.route-thanks #top{display:none}
 body.route-thanks .join-view{display:none}
 /* centred on the full viewport: nav sits in flow above, so pull up by its height
    plus the status-bar inset or the block lands low by half the nav */
-body.route-thanks .thanks-view{display:grid;place-items:center;min-height:100dvh;margin-top:calc(-64px - env(safe-area-inset-top,0px));padding:clamp(1rem,4vh,3rem) 0}
+body.route-thanks .thanks-view{display:grid;place-items:center;min-height:100dvh;padding:clamp(1rem,4vh,3rem) 0}
 body.route-thanks .join-inner{animation:joinIn .45s ease both}
 .thanks-cta{display:flex;flex-direction:column;gap:.7rem;margin-top:2rem;width:100%;max-width:22rem}
 .thanks-cta .btn{width:100%;justify-content:center;padding-block:.85rem}
@@ -481,6 +485,11 @@ footer .fcol a:hover{opacity:1}
 <header class="nav" id="nav">
   <div class="wrap nav-in">
     <a class="wordmark" href="#top" aria-label="onyx home"><img class="logo-img" src="data:image/png;base64,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" alt="onyx"></a>
+    <ul class="nav-links">
+      <li><a href="#product">Product</a></li>
+      <li><a href="#use-cases">Use Cases</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
   </div>
 </header>
 
@@ -524,6 +533,324 @@ footer .fcol a:hover{opacity:1}
     </div>
   </section>
 
+<style>
+/* ── New sections below the hero, 2026-09-07 ──────────────────────────────
+   Product, Use Cases, GHL comparison, About, Final CTA. Reuses the page's own
+   tokens (--card/--line/--muted/--accent/--shadow), the .wrap width utility,
+   the .btn/.btn-primary/.btn-ghost button classes, and the .reveal fade-in
+   convention the hero already uses - the existing IntersectionObserver
+   (`document.querySelectorAll('.reveal')`, further up this file) picks up
+   these elements automatically since it runs after the DOM is parsed. */
+
+
+/* Eyebrow: a small pill label flanked by rule lines, centred above a section
+   heading. Not decoration for its own sake - it gives every section below the
+   hero the same quiet visual signature, 2026-09-07. */
+.eyebrow{display:flex;align-items:center;justify-content:center;gap:.85rem;margin:0 0 1.1rem}
+.eyebrow-line{flex:1;max-width:64px;height:1px;background:var(--line)}
+.eyebrow-label{font-family:var(--body);font-size:.72rem;letter-spacing:.1em;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.3rem .85rem;background:var(--card)}
+
+/* Integrations marquee: same technique as .pillar-track above (duplicated
+   content + a translateX loop), sized for wordmarks instead of short pills,
+   with a soft edge fade so logos dissolve at the viewport edge rather than
+   cutting off. Collapses to a static centred row on mobile and under
+   prefers-reduced-motion, matching the hero's own pillar row exactly. */
+.integrations-viewport{overflow:visible;width:100%}
+.integrations-track{display:flex;justify-content:center}
+.integrations-track .integrations-dup{display:none}
+/* The row (not the track) is what actually needs to wrap - it holds the individual
+   marks. Putting flex-wrap on .integrations-track only ever wraps between the two
+   duplicated ROWS, never within one, which is what overflowed on mobile: caught
+   2026-09-07 by measuring actual bounding boxes at 390px, not assumed fixed by
+   matching the hero's own .pillar-row pattern (base wraps; desktop forces nowrap
+   so the single continuous line can loop). */
+.integrations-row{flex-wrap:wrap;gap:1.5rem 2.5rem}
+@media(min-width:641px){
+  .integrations-viewport{overflow:hidden;-webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent)}
+  .integrations-track{width:max-content;justify-content:flex-start;gap:3.25rem;animation:integrationsScroll 26s linear infinite}
+  .integrations-track .integrations-dup{display:flex;gap:3.25rem}
+  .integrations-row{flex-wrap:nowrap;gap:3.25rem}
+}
+@keyframes integrationsScroll{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+@media(prefers-reduced-motion:reduce){.integrations-track{animation:none;justify-content:center}.integrations-track .integrations-dup{display:none}}
+.integration-mark{display:inline-flex;align-items:center;gap:.55rem;font-family:var(--display);font-weight:700;font-size:1.15rem;letter-spacing:-0.02em;white-space:nowrap;opacity:.85;transition:opacity .15s ease}
+.integration-icon{width:22px;height:22px;display:block}
+.integration-mark:hover{opacity:1}
+.integrations-row{display:flex;align-items:center;justify-content:center}
+
+/* Card entrance: smoother and a little richer than .reveal, reserved for actual
+   UI cards (.vid-card/.uc-card/.ghl-card/.about-card) rather than headings or
+   paragraphs - the ask was "every new card", not every line of text. Shares the
+   same IntersectionObserver as .reveal (see the script below); nothing new to
+   wire up separately. */
+.card-reveal{opacity:0;transform:translateY(26px) scale(.96);filter:blur(5px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1),filter .8s cubic-bezier(.16,1,.3,1)}
+.card-reveal.in{opacity:1;transform:none;filter:blur(0)}
+.card-reveal:nth-child(1){transition-delay:0ms}
+.card-reveal:nth-child(2){transition-delay:90ms}
+.card-reveal:nth-child(3){transition-delay:180ms}
+.card-reveal:nth-child(4){transition-delay:270ms}
+.card-reveal:nth-child(5){transition-delay:360ms}
+@media(prefers-reduced-motion:reduce){.card-reveal{opacity:1;transform:none;filter:none;transition:none}}
+.below{padding:clamp(3.5rem,8vw,6.5rem) 0}
+.below-head{max-width:640px;margin:0 auto clamp(2rem,5vw,3.25rem);text-align:center}
+.below-head h2{font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,3.4vw,2.15rem);letter-spacing:-0.03em;margin:0 0 .6rem;text-wrap:balance}
+.below-head p{color:var(--muted);font-size:1.02rem;margin:0}
+/* .below-alt intentionally removed 2026-09-07: it painted an opaque panel over
+   the page's own fixed soft gradient (body{background:var(--page-base)} + the
+   .gradient-bg glow), which cut a hard rectangular seam into what is otherwise one
+   continuous atmosphere. Sections are now differentiated by spacing alone. */
+
+/* Product: two click-to-play video cards */
+.vid-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:960px;margin:0 auto}
+@media(max-width:760px){.vid-grid{grid-template-columns:1fr}}
+.vid-card{background:var(--card);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.vid-frame{position:relative;aspect-ratio:16/9;background:#000;cursor:pointer}
+.vid-frame img{width:100%;height:100%;object-fit:cover;display:block;opacity:.88;transition:opacity .2s ease}
+.vid-frame:hover img{opacity:1}
+.vid-frame video{width:100%;height:100%;object-fit:cover;display:block}
+.vid-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.vid-play span{width:56px;height:56px;border-radius:999px;background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.28);transition:transform .15s ease}
+.vid-frame:hover .vid-play span{transform:scale(1.07)}
+.vid-play svg{width:20px;height:20px;fill:var(--onyx-blue);margin-left:3px}
+.vid-body{padding:1.1rem 1.3rem 1.3rem}
+.vid-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;color:var(--accent);font-weight:600}
+.vid-body h3{font-size:1.05rem;font-weight:650;margin:.35rem 0 0;letter-spacing:-0.01em}
+
+/* Use Cases: five cards, same order as the hero's pillar row */
+.uc-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:1.1rem;max-width:1000px;margin:0 auto}
+.uc-card{flex:1 1 280px;max-width:310px}
+@media(max-width:600px){.uc-card{flex-basis:100%;max-width:420px}}
+.uc-card{background:var(--card);border-radius:16px;padding:1.4rem 1.5rem;box-shadow:var(--shadow-lg)}
+.uc-label{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;color:var(--accent);font-weight:600}
+.uc-card h3{font-size:1.06rem;font-weight:650;margin:.5rem 0 .4rem;letter-spacing:-0.01em}
+.uc-card p{color:var(--muted);font-size:.93rem;margin:0;line-height:1.55}
+
+/* Moving from GHL: an elevated card (matches .uc-card/.vid-card) built around an
+   actual stat comparison, since the content IS one - not decoration for its own
+   sake. Onyx's 12+18 is counted directly from lib/workflow-graph.ts (hidden/
+   superseded entries excluded); GHL's ~100+~100 is Sehaj's own tally of their
+   live picker and stays hedged with "~" because it's an estimate, not our code. */
+.ghl-card{max-width:760px;margin:0 auto;background:var(--card);border-radius:20px;padding:clamp(1.75rem,4vw,2.75rem);box-shadow:var(--shadow-lg)}
+.ghl-stats{display:flex;align-items:center;justify-content:center;gap:clamp(1.25rem,4vw,2.5rem);text-align:center;margin-bottom:clamp(1.75rem,4vw,2.5rem)}
+.ghl-stat{flex:1 1 180px;max-width:220px}
+.ghl-stat-div{width:1px;align-self:stretch;background:var(--line);min-height:88px}
+.ghl-stat-label{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;font-weight:600;color:var(--accent);margin-bottom:.5rem}
+.ghl-stat-label.ghl-them{color:var(--faint,#9AA2AC)}
+.ghl-stat-num{font-family:var(--display);font-weight:700;font-size:clamp(2.4rem,6vw,3.2rem);letter-spacing:-0.03em;color:var(--accent);line-height:1}
+.ghl-stat-num.ghl-them{color:#9AA2AC}
+.ghl-stat-sub{font-size:.86rem;color:var(--muted);line-height:1.5;margin-top:.5rem}
+.ghl-body{border-top:1px solid var(--line);padding-top:clamp(1.5rem,4vw,2.25rem);margin-bottom:1.6rem}
+.ghl-body p{font-size:1rem;line-height:1.65;color:#2A2E36;margin:0 0 1rem;text-align:center}
+.ghl-body p:last-child{margin-bottom:0}
+.ghl-card .btn{display:block;width:fit-content;margin:0 auto}
+@media(max-width:560px){.ghl-stats{gap:1rem}.ghl-stat-div{min-height:64px}}
+
+/* About: the same elevated-card language, plus a pull-quote lifted verbatim from
+   the body directly below the opening line - standard editorial practice, meant
+   to repeat rather than introduce new copy, so a reader can skim the one line
+   that matters before deciding to read the rest. */
+.about-card{max-width:700px;margin:0 auto;background:var(--card);border-radius:20px;padding:clamp(1.75rem,4vw,2.75rem);box-shadow:var(--shadow-lg)}
+.about-lede{font-size:1.05rem;line-height:1.68;color:#2A2E36;margin:0 0 1.5rem}
+.about-pull{font-family:var(--display);font-weight:650;font-size:clamp(1.2rem,2.6vw,1.5rem);letter-spacing:-0.015em;line-height:1.35;color:var(--onyx-blue);border-left:3px solid var(--onyx-blue);padding-left:1.1rem;margin:0 0 1.75rem}
+.about-wrap{max-width:640px;margin:0 auto}
+.about-wrap p{font-size:1.02rem;line-height:1.68;color:#2A2E36;margin:0 0 1.1rem}
+.about-wrap p:last-child{margin-bottom:0}
+
+/* Final CTA */
+.final-cta{text-align:center;max-width:560px;margin:0 auto}
+.final-cta h2{font-family:var(--display);font-weight:700;font-size:clamp(1.7rem,3.6vw,2.3rem);letter-spacing:-0.03em;margin:0 0 .7rem;text-wrap:balance}
+.final-cta p{color:var(--muted);font-size:1.02rem;margin:0 0 1.6rem}
+</style>
+
+<section class="below" id="integrations">
+  <div class="wrap">
+    <div class="eyebrow reveal"><span class="eyebrow-line"></span><span class="eyebrow-label">INTEGRATIONS</span><span class="eyebrow-line"></span></div>
+    <div class="integrations-viewport reveal">
+      <div class="integrations-track">
+        <span class="integrations-row">
+          <span class="integration-mark" style="color:#EA4335"><img src="assets/integrations/gmail.svg" alt="" class="integration-icon">Gmail</span>
+          <span class="integration-mark" style="color:#4285F4"><img src="assets/integrations/googleads.svg" alt="" class="integration-icon">Google Ads</span>
+          <span class="integration-mark" style="color:#4285F4"><img src="assets/integrations/googlemybusiness.svg" alt="" class="integration-icon">Google Business</span>
+          <span class="integration-mark" style="color:#0866FF"><img src="assets/integrations/meta.svg" alt="" class="integration-icon">Meta</span>
+          <span class="integration-mark" style="color:#635BFF"><img src="assets/integrations/stripe.svg" alt="" class="integration-icon">Stripe</span>
+          <span class="integration-mark" style="color:#F22F46"><img src="assets/integrations/twilio.svg" alt="" class="integration-icon">Twilio</span>
+          <span class="integration-mark" style="color:#14161B">GoHighLevel</span>
+        </span>
+        <span class="integrations-row integrations-dup" aria-hidden="true">
+          <span class="integration-mark" style="color:#EA4335"><img src="assets/integrations/gmail.svg" alt="" class="integration-icon">Gmail</span>
+          <span class="integration-mark" style="color:#4285F4"><img src="assets/integrations/googleads.svg" alt="" class="integration-icon">Google Ads</span>
+          <span class="integration-mark" style="color:#4285F4"><img src="assets/integrations/googlemybusiness.svg" alt="" class="integration-icon">Google Business</span>
+          <span class="integration-mark" style="color:#0866FF"><img src="assets/integrations/meta.svg" alt="" class="integration-icon">Meta</span>
+          <span class="integration-mark" style="color:#635BFF"><img src="assets/integrations/stripe.svg" alt="" class="integration-icon">Stripe</span>
+          <span class="integration-mark" style="color:#F22F46"><img src="assets/integrations/twilio.svg" alt="" class="integration-icon">Twilio</span>
+          <span class="integration-mark" style="color:#14161B">GoHighLevel</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="below" id="product">
+  <div class="wrap">
+    <div class="below-head reveal">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-label">PRODUCT</span><span class="eyebrow-line"></span></div>
+      <h2>Two minutes, and you've seen the whole loop.</h2>
+      <p>No demo call. Just Onyx running, start to finish.</p>
+    </div>
+    <div class="vid-grid">
+      <div class="vid-card card-reveal">
+        <div class="vid-frame" data-video="assets/video/what-is-onyx.mp4" role="button" tabindex="0" aria-label="Play: what Onyx does">
+          <img src="assets/video/what-is-onyx-poster.jpg" alt="A conversation being handled automatically inside Onyx" loading="lazy">
+          <div class="vid-play"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></div>
+        </div>
+        <div class="vid-body">
+          <div class="vid-label">WHAT ONYX DOES</div>
+          <h3>A lead comes in, and Onyx takes it from there.</h3>
+        </div>
+      </div>
+      <div class="vid-card card-reveal">
+        <div class="vid-frame" data-video="assets/video/onboarding.mp4" role="button" tabindex="0" aria-label="Play: getting started">
+          <img src="assets/video/onboarding-poster.jpg" alt="Choosing a plan during Onyx setup" loading="lazy">
+          <div class="vid-play"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></div>
+        </div>
+        <div class="vid-body">
+          <div class="vid-label">GETTING STARTED</div>
+          <h3>Set up your business, and you're quoting the same sitting.</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="below" id="use-cases">
+  <div class="wrap">
+    <div class="below-head reveal">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-label">USE CASES</span><span class="eyebrow-line"></span></div>
+      <h2>One system, five jobs it used to take five tools to do.</h2>
+      <p>Every tool you're paying for, into one system.</p>
+    </div>
+    <div class="uc-grid">
+      <div class="uc-card card-reveal">
+        <div class="uc-label">MARKETING</div>
+        <h3>A quiet lead doesn't stay quiet.</h3>
+        <p>If a lead goes cold, Onyx follows up automatically, so a slow customer doesn't quietly turn into a lost one.</p>
+      </div>
+      <div class="uc-card card-reveal">
+        <div class="uc-label">SALES</div>
+        <h3>The quote prices itself.</h3>
+        <p>Pick the service, the floor size, the condition. Onyx prices it by square metre the way this trade actually quotes, and emails it. No login for your customer.</p>
+      </div>
+      <div class="uc-card card-reveal">
+        <div class="uc-label">JOBS</div>
+        <h3>Sign, pay the deposit, and it's already on the board.</h3>
+        <p>A customer signs and pays the deposit on the same page, in one sitting, and the job is created in Onyx automatically.</p>
+      </div>
+      <div class="uc-card card-reveal">
+        <div class="uc-label">FINANCES</div>
+        <h3>Know your margin before you send it.</h3>
+        <p>See what a job will actually make you, not just what it will bill, before the quote ever goes out.</p>
+      </div>
+      <div class="uc-card card-reveal">
+        <div class="uc-label">PAYMENTS</div>
+        <h3>Every payment tied to the job it belongs to.</h3>
+        <p>Deposits, final payments, and everything after are tracked against the job, not a separate ledger you reconcile by hand.</p>
+      </div>
+    </div>
+    <div class="reveal" style="text-align:center;margin-top:clamp(2rem,5vw,2.75rem)">
+      <a class="btn btn-primary" href="#join">Join the waitlist</a>
+    </div>
+  </div>
+</section>
+
+<section class="below" id="ghl">
+  <div class="wrap">
+    <div class="below-head reveal">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-label">COMPARISON</span><span class="eyebrow-line"></span></div>
+      <h2>Moving from GoHighLevel?</h2>
+    </div>
+    <div class="ghl-card card-reveal">
+      <div class="ghl-stats">
+        <div class="ghl-stat reveal">
+          <div class="ghl-stat-label ghl-them">GOHIGHLEVEL</div>
+          <div class="ghl-stat-num ghl-them">~200</div>
+          <div class="ghl-stat-sub">triggers + actions, roughly half built for courses, communities, an online store</div>
+        </div>
+        <div class="ghl-stat-div" aria-hidden="true"></div>
+        <div class="ghl-stat reveal">
+          <div class="ghl-stat-label">ONYX</div>
+          <div class="ghl-stat-num">30</div>
+          <div class="ghl-stat-sub">triggers + actions, every one built for this trade</div>
+        </div>
+      </div>
+      <div class="ghl-body">
+        <p>The rest of GoHighLevel's catalogue is exactly the ground Onyx already covers, built for one trade instead of ten different businesses.</p>
+        <p>We've already built the connection: Onyx can pull your contacts and pipelines straight from your GoHighLevel account. It's in limited early access while our GoHighLevel marketplace listing clears review. Join the waitlist and we'll reach out when yours is ready.</p>
+      </div>
+      <a class="btn btn-primary" href="#join">Join the waitlist</a>
+    </div>
+  </div>
+</section>
+
+<section class="below" id="about">
+  <div class="wrap">
+    <div class="below-head reveal">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-label">ABOUT</span><span class="eyebrow-line"></span></div>
+      <h2>About Onyx</h2>
+    </div>
+    <div class="about-card card-reveal">
+      <p class="about-lede">Most epoxy flooring contractors run their business the same way they always have: spreadsheets, text threads, and whatever CRM they could find that was built for someone else's industry. Onyx exists because that gap is real, and it costs contractors money every week.</p>
+      <blockquote class="about-pull">It was built by installers: people who ran an epoxy flooring company and lived every part of the back end themselves.</blockquote>
+      <div class="about-wrap">
+        <p>Onyx wasn't built by a software team guessing at what a trade business needs. It was built by installers, people who ran an epoxy flooring company and lived every part of the back end themselves: the quoting, the follow-ups, the scheduling, the chasing of deposits and paperwork that never seems to end. So we built our own system, used it to run our own jobs and manage our own crew, and once it worked for us, realised every other trade business was fighting the same fight.</p>
+        <p>That's still what Onyx is today: a CRM built specifically for epoxy flooring contractors, shaped around the way this trade actually works, because it was shaped by people doing the work.</p>
+        <p>Setup happens right inside the app, in a few short steps: your details, your business, your rates. No demo call, no sales gate.</p>
+        <p>Onyx keeps growing the way it started: installers watching what actually slows epoxy contractors down, and building the smallest, most direct fix for it. Fewer spreadsheets. Fewer dropped leads. Fewer hours spent on parts of the job that should have been automatic all along.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="below" id="final-cta">
+  <div class="wrap">
+    <div class="final-cta reveal">
+      <h2>Ready to run it this way?</h2>
+      <p>Join the waitlist. We're inviting contractors in gradually, starting October 2026.</p>
+      <a class="btn btn-primary" href="#join">Join now</a>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  // Click-to-play facade for the two Product videos: nothing loads or plays until
+  // pressed, so the page never ships two live video players to a visitor who never
+  // presses play. Self-contained and independent of the main routing/reveal script
+  // above, on purpose - this has nothing to do with #join/#thanks routing.
+  document.querySelectorAll('.vid-frame').forEach(function(frame){
+    function play(){
+      var src = frame.getAttribute('data-video');
+      var video = document.createElement('video');
+      // Deliberately no `autoplay` attribute, and NOT muted. Setting autoplay on an
+      // element inserted by script - even from inside a click handler - is treated
+      // inconsistently by browsers and can start the video silently. Calling .play()
+      // directly and synchronously inside the click/keydown handler is the reliable
+      // pattern: it is unambiguously tied to the user's own gesture, so the browser
+      // permits audio rather than force-muting it. If it's still silent, check the
+      // tab isn't muted (right-click the tab, or the speaker icon in the tab strip)
+      // and the system volume - Chrome auto-mutes a tab the FIRST time it judges an
+      // autoplay attempt unearned, and that mute is sticky per-tab until toggled.
+      video.src = src; video.controls = true; video.playsInline = true;
+      frame.innerHTML = '';
+      frame.appendChild(video);
+      frame.removeAttribute('role'); frame.removeAttribute('tabindex');
+      video.play().catch(function(){ /* user can still press the native play control */ });
+    }
+    frame.addEventListener('click', play);
+    frame.addEventListener('keydown', function(e){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); play(); } });
+  });
+})();
+</script>
+
 </main>
 
 <section id="join" class="join-view" aria-label="Join the onyx waitlist">
@@ -551,7 +878,7 @@ footer .fcol a:hover{opacity:1}
       <button class="btn btn-primary" type="submit">CLAIM 50% OFF FOR LIFE</button>
     </form>
     <p class="form-error" id="formError" role="alert" hidden></p>
-    <p class="offer-line">No credit card. We'll only ever email you about onyx. Your details go to our waitlist &mdash; see the <a href="/privacy">privacy policy</a>.</p>
+    <p class="offer-line">No credit card. We'll only ever email you about onyx. Your details go to our waitlist. See the <a href="/privacy">privacy policy</a>.</p>
   </div>
 </section>
 
@@ -578,13 +905,13 @@ footer .fcol a:hover{opacity:1}
   // scroll reveal + highlighter swipe
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reduce){
-    document.querySelectorAll('.reveal').forEach(function(e){e.classList.add('in')});
+    document.querySelectorAll('.reveal, .card-reveal').forEach(function(e){e.classList.add('in')});
     document.querySelectorAll('.hl').forEach(function(e){e.classList.add('lit')});
   }else{
     var io=new IntersectionObserver(function(es){
       es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target)}})
     },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
-    document.querySelectorAll('.reveal').forEach(function(e){io.observe(e)});
+    document.querySelectorAll('.reveal, .card-reveal').forEach(function(e){io.observe(e)});
     var hlIO=new IntersectionObserver(function(es){
       es.forEach(function(en){if(en.isIntersecting){setTimeout(function(){en.target.classList.add('lit')},180);hlIO.unobserve(en.target)}})
     },{threshold:.9});
@@ -823,6 +1150,15 @@ footer .fcol a:hover{opacity:1}
   document.querySelectorAll('a[href^="#"]').forEach(function(a){
     a.addEventListener('click',function(e){
       var href=a.getAttribute('href');
+      // #top/#join/#thanks are the three full-screen routes and keep their exact
+      // existing behaviour. Anything else that matches an in-page section (Product,
+      // Use Cases, About...) is a plain scroll target, not a route change - added for
+      // the sections below the hero, 2026-09-07.
+      var isRoute = (href==='#top' || href==='#join' || href==='#thanks');
+      if(!isRoute){
+        var target=document.getElementById(href.slice(1));
+        if(target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth', block:'start'}); return; }
+      }
       e.preventDefault();
       if(location.hash===href){ route(); } else { location.hash=href; }
     });
@@ -841,6 +1177,14 @@ footer .fcol a:hover{opacity:1}
 header.nav,header.nav.scrolled{
   position:static;background:transparent;backdrop-filter:none;border-bottom-color:transparent;
 }
+
+/* The hero/join/thanks views each had `margin-top:calc(-64px - ...)` to pull them up
+   BEHIND a sticky, transparent header - standard for an overlaying nav. Once the header
+   above went `position:static` (2026-09-03), that negative margin no longer compensates
+   for an overlay; it pulls each view's box up ON TOP of the header in normal flow, which
+   silently swallowed clicks on anything in the nav bar - caught 2026-09-07 when new nav
+   links stopped being clickable. Removed at the source (the three rules above) rather
+   than patched here, since this file is the header's own home. */
 
 .lgl-foot{border-top:1px solid var(--line,#E6E8ED);background:var(--ground,#fff);
   padding:26px 24px;font-family:var(--body,system-ui);font-size:.86rem;color:#7A828E}
