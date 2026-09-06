@@ -551,7 +551,7 @@ footer .fcol a:hover{opacity:1}
       <button class="btn btn-primary" type="submit">CLAIM 50% OFF FOR LIFE</button>
     </form>
     <p class="form-error" id="formError" role="alert" hidden></p>
-    <p class="offer-line">No credit card. We'll only ever email you about onyx.</p>
+    <p class="offer-line">No credit card. We'll only ever email you about onyx. Your details go to our waitlist &mdash; see the <a href="/privacy">privacy policy</a>.</p>
   </div>
 </section>
 
@@ -830,5 +830,34 @@ footer .fcol a:hover{opacity:1}
 
 })();
 </script>
+
+<style>
+/* No opaque bar at the top on scroll. This is the treatment the page already used below
+   900px - the comment there is "let the background run to the top edge... nothing ghosts
+   under the logo" - now applied at every width, because the reasoning does not change with
+   viewport. The nav scrolls away with the page rather than sticking transparently, which
+   would leave the logo floating over the content it is meant to sit above.
+   The footer keeps its top border; it is the only rule on the page now. */
+header.nav,header.nav.scrolled{
+  position:static;background:transparent;backdrop-filter:none;border-bottom-color:transparent;
+}
+
+.lgl-foot{border-top:1px solid var(--line,#E6E8ED);background:var(--ground,#fff);
+  padding:26px 24px;font-family:var(--body,system-ui);font-size:.86rem;color:#7A828E}
+.lgl-foot-in{max-width:1080px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center}
+.lgl-foot a{color:#5B6472;text-decoration:none}
+.lgl-foot a:hover{color:#14161B;text-decoration:underline}
+.lgl-foot .lgl-sp{margin-left:auto}
+@media(max-width:560px){.lgl-foot .lgl-sp{margin-left:0;width:100%}}
+</style>
+<footer class="lgl-foot">
+  <div class="lgl-foot-in">
+    <a href="/privacy">Privacy</a>
+    <a href="/terms">Terms</a>
+    <a href="/partners">Partners</a>
+    <a href="mailto:support@onyx-tech.ai">support@onyx-tech.ai</a>
+    <span class="lgl-sp">&copy; 2026 Onyx Technologies &middot; Australia</span>
+  </div>
+</footer>
 </body>
 </html>
