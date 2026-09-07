@@ -347,6 +347,12 @@ body.route-thanks .join-inner{animation:joinIn .45s ease both}
   .hero-copy .wl-proof{justify-content:center}
   .hero-copy h1{max-width:16ch}
   .pillar-row{justify-content:center}
+  /* the copy is the whole first screen on mobile - it reserves a full svh
+     (minus the static nav's own height) so nothing below the offer line
+     (the hero-visual composition, or the next section) peeks in before the
+     user actually scrolls. Content itself stays top-aligned exactly as
+     before; this only guarantees the leftover space lands below it. */
+  .hero-copy{min-height:calc(100svh - 64px - env(safe-area-inset-top,0px))}
   /* same composition as desktop (frame + notes + phone, overlapping), just
      scaled down to fit a narrow column instead of dropping pieces */
   .hero-visual{margin-top:2.4rem}
