@@ -66,8 +66,7 @@
 /* the page paints into the iOS safe areas (viewport-fit=cover), so html carries the
    same base as body — otherwise overscroll and the status/home-indicator bands
    fall back to plain white */
-html{scroll-behavior:smooth;background:var(--page-base);min-height:100%}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+html{background:var(--page-base);min-height:100%}
 body{
   margin:0;background:var(--page-base);color:var(--text);
   font-family:var(--body);font-size:1.0625rem;line-height:1.6;
