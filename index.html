@@ -573,7 +573,7 @@ footer .fcol a:hover{opacity:1}
           </div>
         </div>
         <div class="wl-proof reveal">
-          <span class="wl-text">Join <b data-wl-count>17</b> others on the waitlist.</span>
+          <span class="wl-text">Join <b data-wl-count>37</b> others on the waitlist.</span>
         </div>
         <a class="btn btn-primary hero-join reveal" href="#join">Join now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a>
         <p class="offer-line reveal">Founding members lock in <b class="pop">50% OFF FOR LIFE.</b> <span class="offer-sub">No credit card to join.</span></p>
@@ -1320,7 +1320,7 @@ footer .fcol a:hover{opacity:1}
   // cut at, so editing Apps Script does nothing until a NEW VERSION of THIS
   // deployment is published. Verified 2026-09-02 by posting to both.
   var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwgQGqmlgWKAfAOpV0NFifGjs64wF0F7W4XVUyWarqC93PWPIbX6QVgu7yvdblnrboY/exec';
-  var WL_BASE=17, WL_KEY='onyx_wl_count';
+  var WL_BASE=37, WL_KEY='onyx_wl_count';
 
   // ── Referral attribution ───────────────────────────────────────────────────
   // An affiliate sends someone here as ?ref=their-code. The code is REMEMBERED
@@ -1406,22 +1406,40 @@ footer .fcol a:hover{opacity:1}
       });
     });
   }
-  // the static markup hardcodes today's count as a no-JS fallback, which would
-  // otherwise equal wlCached() on a fresh visit and make wlShow's "already
-  // showing this number" check skip the animation on the one load where it
-  // matters most - force the visible start back to 0 so it always rolls up.
-  document.querySelectorAll('[data-wl-count]').forEach(function(e){ e.textContent='0'; });
-  wlShow(wlCached());
+  // A first-ever visit (nothing cached) starts from 0 so the live count's arrival
+  // is a satisfying roll-up; a returning visitor already has a trustworthy cached
+  // number, so it paints straight away instead of replaying 0-to-N on every visit.
+  // Either way, refreshCount() below drives the one real animation. This used to
+  // animate to the hardcoded fallback on its own fixed 2.2s timer and only THEN
+  // fetch the live count - but the Apps Script endpoint 302s to its real execution
+  // URL before it responds (~3s round trip, measured), so the fallback animation
+  // routinely finished and sat still for a second or more before jumping to the
+  // real number. Outside live mode (preview/offline) no fetch is ever coming, so
+  // that path keeps its own animated fallback.
+  if(liveMode){
+    var hadCache = !isNaN(parseInt(localStorage.getItem(WL_KEY),10));
+    document.querySelectorAll('[data-wl-count]').forEach(function(e){
+      e.textContent = hadCache ? wlCached().toLocaleString() : '0';
+    });
+  }else{
+    document.querySelectorAll('[data-wl-count]').forEach(function(e){ e.textContent='0'; });
+    wlShow(wlCached());
+  }
 
+  var wlGotLive=false;
   function refreshCount(){
     if(!liveMode) return;
     fetch(WEBAPP_URL,{method:'GET'})
       .then(function(r){return r.json()})
-      .then(function(d){ if(d && typeof d.count==='number'){ wlStore(d.count); wlShow(d.count); } })
+      .then(function(d){ if(d && typeof d.count==='number'){ wlGotLive=true; wlStore(d.count); wlShow(d.count); } })
       .catch(function(){});
   }
   refreshCount();
   if(liveMode) setInterval(refreshCount, 20000); // poll every 20s so it ticks up as others join
+  // Safety net for a slow/failed first fetch: 4s is comfortably past the normal
+  // ~3s round trip, so this is a no-op on a normal load and only rescues a
+  // visitor who'd otherwise stare at 0 with no backend response in sight.
+  if(liveMode) setTimeout(function(){ if(!wlGotLive) wlShow(wlCached()); }, 4000);
 
   var form=document.getElementById('wlForm');
   if(form){
