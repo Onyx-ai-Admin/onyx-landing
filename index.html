@@ -72,10 +72,11 @@
    overscroll-behavior:none is the actual fix for that boundary bug (it stops
    the elastic rubber-band bounce at the top/bottom edge, which is what was
    fighting the smooth-scroll animation), so the glide can come back without
-   the stutter returning with it. Must be the SHORTHAND, not overscroll-behavior-y
-   alone: measured in real WebKit (Safari's engine), the -y-only longhand still let
-   the page overshoot ~150px past the true bottom before settling back - the
-   shorthand (or setting both axes explicitly) is what actually clamps it. */
+   the stutter returning with it. Shorthand rather than overscroll-behavior-y
+   alone mainly so the x-axis is covered too (stops an edge swipe from
+   triggering the browser's back/forward gesture) - see the .ai-demo rule
+   further down for the actual fix to the "still bouncy at the bottom" report,
+   which turned out to be a layout shift, not this. */
 html{scroll-behavior:smooth;overscroll-behavior:none;background:var(--page-base);min-height:100%}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{
@@ -748,7 +749,13 @@ footer .fcol a:hover{opacity:1}
    quotes, schedule) rather than claiming to draft or send anything - that's
    the workflow-automation engine's territory (see #ghl/#value above), and
    the two shouldn't sound like the same feature. */
-.ai-demo{display:flex;justify-content:center}
+/* min-height reserves room for the reply bubble before it ever expands (up to
+   ~253px measured across all three canned answers, in both Chromium and WebKit)
+   - without this, the .ai-reply max-height transition below grows the card by
+   ~150px live, which shoves every section below it down mid-scroll. align-items
+   keeps the card itself sized to its actual content instead of being stretched
+   to fill the reserved space, so it still visibly pops in exactly as before. */
+.ai-demo{display:flex;justify-content:center;align-items:flex-start;min-height:264px}
 .ai-card{position:relative;width:min(480px,100%);background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow-lg);overflow:hidden}
 .ai-reply{max-height:0;opacity:0;overflow:hidden;padding:0 1.2rem;transition:max-height .45s cubic-bezier(.175,.885,.32,1.275),opacity .3s ease,padding .45s cubic-bezier(.175,.885,.32,1.275)}
 .ai-reply.show{max-height:160px;opacity:1;padding:1.1rem 1.2rem 0}
