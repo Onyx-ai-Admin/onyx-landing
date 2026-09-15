@@ -69,17 +69,20 @@
 /* scroll-behavior:smooth is what makes a mouse-wheel notch glide instead of
    teleporting the page - removing it earlier fixed a stutter/bounce at the very
    bottom of the page, but also made every ordinary scroll feel instant/static.
-   overscroll-behavior-y:none is the actual fix for that boundary bug (it stops
+   overscroll-behavior:none is the actual fix for that boundary bug (it stops
    the elastic rubber-band bounce at the top/bottom edge, which is what was
    fighting the smooth-scroll animation), so the glide can come back without
-   the stutter returning with it. */
-html{scroll-behavior:smooth;overscroll-behavior-y:none;background:var(--page-base);min-height:100%}
+   the stutter returning with it. Must be the SHORTHAND, not overscroll-behavior-y
+   alone: measured in real WebKit (Safari's engine), the -y-only longhand still let
+   the page overshoot ~150px past the true bottom before settling back - the
+   shorthand (or setting both axes explicitly) is what actually clamps it. */
+html{scroll-behavior:smooth;overscroll-behavior:none;background:var(--page-base);min-height:100%}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{
   margin:0;background:var(--page-base);color:var(--text);
   font-family:var(--body);font-size:1.0625rem;line-height:1.6;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-  overscroll-behavior-y:none;
+  overscroll-behavior:none;
 }
 .wrap{width:min(1120px,92vw);margin-inline:auto}
 section{padding-block:clamp(4rem,9vw,7rem)}
