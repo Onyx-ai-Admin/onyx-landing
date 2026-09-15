@@ -841,7 +841,49 @@ footer .fcol a:hover{opacity:1}
 .final-cta{text-align:center;max-width:560px;margin:0 auto}
 .final-cta h2{font-family:var(--display);font-weight:700;font-size:clamp(1.7rem,3.6vw,2.3rem);letter-spacing:-0.03em;margin:0 0 .7rem;text-wrap:balance}
 .final-cta p{color:var(--muted);font-size:1.02rem;margin:0 0 1.6rem}
+
+/* Problem: flat, quiet cards with a ghost numeral - deliberately the one
+   section on the page that isn't a lifted white card, so everything after
+   it (Integrations onward) visually resolves the friction just named. */
+.problem-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.1rem;max-width:840px;margin:0 auto}
+@media(max-width:700px){.problem-grid{grid-template-columns:1fr}}
+.problem-card{position:relative;background:var(--subtle);border-radius:20px;padding:1.6rem 1.75rem;overflow:hidden}
+.problem-card .num{position:absolute;top:.7rem;right:1.15rem;font-family:var(--display);font-weight:200;font-size:2.75rem;color:rgba(20,22,27,.10);line-height:1;user-select:none}
+.problem-card h3{position:relative;font-size:1.05rem;font-weight:650;letter-spacing:-0.01em;max-width:80%;margin:0 0 .5rem}
+.problem-card p{position:relative;color:var(--muted);font-size:.93rem;line-height:1.55;margin:0}
 </style>
+
+<section class="below" id="problem">
+  <div class="wrap">
+    <div class="below-head reveal">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-label">THE PROBLEM</span><span class="eyebrow-line"></span></div>
+      <h2>None of it was built for this trade.</h2>
+      <p>Jobber. ServiceM8. GoHighLevel. QuickBooks. Built for plumbers, HVAC crews and everyone else, not for square metre pricing, flake and metallic finishes, or the way a coatings job actually runs.</p>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card card-reveal">
+        <span class="num">01</span>
+        <h3>Priced for someone else's trade</h3>
+        <p>Generic quoting tools know flat rates and hourly labour. None of them know what to do with square metres, flake, metallic or quartz, so you're still pricing jobs by hand.</p>
+      </div>
+      <div class="problem-card card-reveal">
+        <span class="num">02</span>
+        <h3>Paying for ten tools to do one job</h3>
+        <p>CRM, quoting, e-signatures, scheduling, payments, review management. Pay for them separately and that's $700+ a month for pieces that don't talk to each other.</p>
+      </div>
+      <div class="problem-card card-reveal">
+        <span class="num">03</span>
+        <h3>Leads going cold on the drive home</h3>
+        <p>A missed call or a slow reply is a lost job to whoever answers first. Most systems only chase a lead if you remember to.</p>
+      </div>
+      <div class="problem-card card-reveal">
+        <span class="num">04</span>
+        <h3>Admin after the truck's packed up</h3>
+        <p>Chasing an unpaid invoice, retyping a job into three different apps, updating a spreadsheet at 9pm. Hours that should've gone to the next quote.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section class="below" id="integrations">
   <div class="wrap">
