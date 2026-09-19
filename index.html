@@ -551,6 +551,7 @@ footer .fcol a:hover{opacity:1}
       <li><a class="nav-ai" href="#ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.5 6.5l2 2M15.5 15.5l2 2M17.5 6.5l-2 2M8.5 15.5l-2 2"/></svg>Onyx AI</a></li>
       <li><a href="about/">About</a></li>
     </ul>
+    <div class="nav-cta"><a class="btn btn-primary nav-join" href="#join">Join waitlist</a></div>
   </div>
 </header>
 
@@ -826,6 +827,7 @@ footer .fcol a:hover{opacity:1}
 .value-total-num{font-family:var(--display);font-weight:700;font-size:clamp(1.6rem,3.4vw,2rem);letter-spacing:-.02em;color:var(--text)}
 .value-total-q{max-width:24ch;font-weight:600;color:var(--accent);text-align:right;line-height:1.4}
 .value-card .btn{display:block;width:fit-content;margin:0 auto}
+.value-total:last-child{margin-bottom:0}
 @media(max-width:560px){
   .value-row{grid-template-columns:1fr auto 3.5rem;padding:.7rem .7rem;gap:.4rem}
   .value-feature,.value-cost{font-size:.82rem}
@@ -868,13 +870,13 @@ footer .fcol a:hover{opacity:1}
     <div class="below-head reveal">
       <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-label">THE PROBLEM</span><span class="eyebrow-line"></span></div>
       <h2>None of it was built for this trade.</h2>
-      <p>Jobber. ServiceM8. GoHighLevel. QuickBooks. Built for plumbers, HVAC crews and everyone else, not for square metre pricing, flake and metallic finishes, or the way a coatings job actually runs.</p>
+      <p>Jobber. ServiceM8. GoHighLevel. QuickBooks. Built for plumbers, HVAC crews and everyone else, not for <span data-unit="noun">square metre</span> pricing, flake and metallic finishes, or the way a coatings job actually runs.</p>
     </div>
     <div class="problem-grid">
       <div class="problem-card card-reveal">
         <span class="num">01</span>
         <h3>Priced for someone else's trade</h3>
-        <p>Generic quoting tools know flat rates and hourly labour. None of them know what to do with square metres, flake, metallic or quartz, so you're still pricing jobs by hand.</p>
+        <p>Generic quoting tools know flat rates and hourly labour. None of them know what to do with <span data-unit="plural">square metres</span>, flake, metallic or quartz, so you're still pricing jobs by hand.</p>
       </div>
       <div class="problem-card card-reveal">
         <span class="num">02</span>
@@ -969,9 +971,15 @@ footer .fcol a:hover{opacity:1}
         <p>If a lead goes cold, Onyx follows up automatically, so a slow customer doesn't quietly turn into a lost one.</p>
       </div>
       <div class="uc-card card-reveal">
-        <div class="uc-label">SALES</div>
+        <div class="uc-top">
+          <div class="uc-label">SALES</div>
+          <div class="unit-toggle" role="group" aria-label="Measurement units">
+            <button type="button" data-set-unit="m" aria-pressed="true">m²</button>
+            <button type="button" data-set-unit="ft" aria-pressed="false">sq ft</button>
+          </div>
+        </div>
         <h3>The quote prices itself.</h3>
-        <p>Pick the service, the floor size, the condition. Onyx prices it by square metre the way this trade actually quotes, and emails it. No login for your customer.</p>
+        <p>Pick the service, the floor size, the condition. Onyx prices it by <span data-unit="noun">square metre</span> the way this trade actually quotes, and emails it. No login for your customer.</p>
       </div>
       <div class="uc-card card-reveal">
         <div class="uc-label">JOBS</div>
@@ -1016,7 +1024,7 @@ footer .fcol a:hover{opacity:1}
         <div class="story-card card-reveal">
           <span class="story-time">8:43 AM</span>
           <h3>A quote goes out before the coffee's done.</h3>
-          <p>Priced by square metre, floor type and condition. No login for the customer to open it.</p>
+          <p>Priced by <span data-unit="noun">square metre</span>, floor type and condition. No login for the customer to open it.</p>
         </div>
       </div>
       <div class="story-step story-step-left">
@@ -1141,6 +1149,168 @@ footer .fcol a:hover{opacity:1}
 })();
 </script>
 
+<style>
+/* ── Waitlist conversion sections, 2026-09-19 ────────────────────────────────
+   Nav join button, units toggle, Compare, Founding price, Savings calculator,
+   FAQ and Outcomes. Same rules as the 2026-09-07 block above: page tokens only,
+   the .below/.below-head/.eyebrow section frame, the lifted white card, and the
+   shared .reveal/.card-reveal observer. Where an existing component fits it is
+   reused as-is (.ghl-stats for the price anchor, .hero-form for the calculator's
+   email field, the details/summary/.plus FAQ rules from the head block) rather
+   than restyled here. */
+
+/* Nav: the .nav-cta slot already existed (and is already hidden on #join) -
+   this fills it. Smaller than a section button so it sits with the nav links. */
+.nav-cta .nav-join{padding:.5rem .95rem;font-size:.87rem}
+body.route-thanks .nav-cta{visibility:hidden}
+
+/* Units toggle on the Sales card. Swaps every [data-unit] phrase on the page,
+   not just this card, so the page never says "square feet" in one place and
+   "square metres" in the next. Matches the app's own workspace-wide setting. */
+.uc-top{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+/* negative block margin: the pill is taller than the label beside it, and without
+   this the Sales heading sits lower than the other four cards' */
+.unit-toggle{display:inline-flex;padding:2px;border-radius:999px;background:var(--subtle);border:1px solid var(--line);flex:none;margin-block:-.4rem}
+.unit-toggle button{font-family:var(--mono);font-size:.66rem;letter-spacing:.04em;font-weight:600;color:var(--muted);background:transparent;border:0;border-radius:999px;padding:.24rem .62rem;cursor:pointer;transition:background .15s ease,color .15s ease,box-shadow .15s ease}
+.unit-toggle button:hover{color:var(--text)}
+.unit-toggle button[aria-pressed="true"]{background:var(--card);color:var(--accent);box-shadow:var(--shadow)}
+.unit-toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Compare: a real table (it IS tabular data), inside the same lifted card and
+   bordered inner table as .value-card/.value-table. Scrolls sideways inside
+   the card on a phone rather than squashing four columns into 400px. */
+.cmp-card{max-width:960px;margin:0 auto;background:var(--card);border-radius:20px;padding:clamp(1.1rem,3vw,2rem);box-shadow:var(--shadow-lg)}
+.cmp-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;-webkit-overflow-scrolling:touch}
+.cmp-table{width:100%;min-width:640px;border-collapse:collapse;font-size:.9rem;line-height:1.45}
+.cmp-table th,.cmp-table td{padding:.9rem 1rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.cmp-table tbody tr:last-child>*{border-bottom:0}
+.cmp-table thead th{background:var(--subtle);font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;vertical-align:middle}
+.cmp-table tbody th{font-weight:600;color:var(--text);width:24%}
+.cmp-table small{display:block;font-weight:400;font-size:.78rem;color:var(--muted);margin-top:.2rem}
+.cmp-table td{color:var(--muted)}
+.cmp-table .cmp-onyx{background:color-mix(in srgb,var(--accent) 5%,var(--card));color:var(--text)}
+.cmp-table thead .cmp-onyx{background:color-mix(in srgb,var(--accent) 10%,var(--subtle));color:var(--accent)}
+.cmp-table td b{font-weight:700;color:var(--accent)}
+.cmp-mark{display:inline-flex;align-items:flex-start;gap:.45rem}
+.cmp-ic{width:1.15rem;height:1.15rem;border-radius:50%;flex:none;display:grid;place-items:center;margin-top:.08rem}
+.cmp-ic svg{width:.6rem;height:.6rem}
+.cmp-yes .cmp-ic{background:var(--accent);color:#fff}
+.cmp-no .cmp-ic{background:var(--subtle);border:1px solid var(--line);color:#9AA2AC}
+/* phone: the Onyx column is pinned to the right edge so it's always in view
+   and the competitors scroll underneath it, rather than being the column you
+   have to swipe to find. Its backgrounds are already opaque mixes. */
+@media(max-width:700px){
+  .cmp-table{min-width:600px}
+  .cmp-table .cmp-onyx{position:sticky;right:0;z-index:1;box-shadow:-10px 0 14px -10px rgba(20,22,27,.18);min-width:9.5rem}
+}
+.cmp-source{margin-top:1rem;font-size:.8rem;color:var(--muted);text-align:center;line-height:1.55}
+.cmp-source a{color:var(--muted);text-underline-offset:3px}
+.cmp-source a:hover{color:var(--text)}
+
+/* Founding price: the .ghl-card/.ghl-stats comparison component, reused
+   unchanged - it is exactly "their number vs ours". */
+.price-card .ghl-body p b{color:var(--accent);font-weight:700}
+/* the old cost, struck through in the page's own error red (#D93025, as on the form) */
+.price-card .ghl-stat-num.price-was{color:#D93025}
+.price-was s{text-decoration-thickness:.07em;text-decoration-color:currentColor}
+
+/* Savings calculator */
+.calc-card{max-width:760px;margin:0 auto;background:var(--card);border-radius:20px;padding:clamp(1.75rem,4vw,2.75rem);box-shadow:var(--shadow-lg)}
+.calc-label{display:block;text-align:center;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.calc-spend{display:block;text-align:center;font-family:var(--display);font-weight:700;font-size:clamp(2.4rem,6vw,3.2rem);letter-spacing:-.03em;line-height:1;margin-top:.6rem;color:var(--text);font-variant-numeric:tabular-nums}
+.calc-spend span{font-size:.4em;color:var(--muted);font-weight:500;letter-spacing:0;margin-left:.15rem}
+/* track + fill mirror the waitlist .meter bar in the head block */
+.calc-range{-webkit-appearance:none;appearance:none;display:block;width:100%;height:8px;border-radius:99px;margin:1.6rem 0 0;cursor:pointer;
+  background:linear-gradient(var(--accent),var(--accent)) 0 0/var(--p,18.75%) 100% no-repeat,color-mix(in srgb,var(--text) 12%,transparent)}
+.calc-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--card);border:2px solid var(--accent);box-shadow:var(--shadow)}
+.calc-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--card);border:2px solid var(--accent);box-shadow:var(--shadow)}
+.calc-range:focus-visible{outline:2px solid var(--accent);outline-offset:6px}
+.calc-scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:.65rem}
+.calc-results{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border-radius:14px;overflow:hidden;margin-top:1.6rem}
+.calc-result{background:var(--subtle);padding:1.1rem 1.3rem}
+.calc-result .value-total-num{color:var(--accent);font-variant-numeric:tabular-nums}
+.calc-note{margin-top:.8rem;font-size:.85rem;color:var(--muted);text-align:center}
+@media(max-width:520px){.calc-results{grid-template-columns:1fr}}
+
+/* FAQ: the details/summary/.plus rules from the head block, inside the same
+   lifted card as every other section below the hero. */
+.faq-card{max-width:760px;margin:0 auto;background:var(--card);border-radius:20px;padding:.35rem clamp(1.4rem,4vw,2.25rem);box-shadow:var(--shadow-lg)}
+.faq-card details:first-child{border-top:0}
+.faq-card details:last-child{border-bottom:0}
+.faq-card summary{font-size:1.02rem;font-weight:650;letter-spacing:-.01em;padding-block:.1rem}
+.faq-card summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:6px}
+.faq-card details p{font-size:.95rem;line-height:1.6}
+/* open = a plain minus (the head block's rule rotates the bar to vertical) */
+.faq-card details[open] summary .plus{transform:none}
+
+/* Outcomes: three stats, auto-fit so a fourth (real pilot data) drops in
+   without touching this CSS. */
+.stat-bar{max-width:960px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));background:var(--card);border-radius:20px;box-shadow:var(--shadow-lg);overflow:hidden}
+.stat-item{padding:clamp(1.5rem,3.5vw,2.25rem) 1.5rem;text-align:center;border-left:1px solid var(--line)}
+.stat-item:first-child{border-left:0}
+.stat-num{font-family:var(--display);font-weight:700;font-size:clamp(2.2rem,5vw,3rem);letter-spacing:-.03em;color:var(--accent);line-height:1}
+.stat-label{margin:.6rem auto 0;font-size:.9rem;color:var(--muted);line-height:1.5;max-width:22ch}
+@media(max-width:700px){.stat-bar{grid-template-columns:1fr}.stat-item{border-left:0;border-top:1px solid var(--line)}.stat-item:first-child{border-top:0}}
+</style>
+
+<section class="below seq" id="compare">
+  <div class="wrap">
+    <div class="below-head reveal">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-label">SIDE BY SIDE</span><span class="eyebrow-line"></span></div>
+      <h2>How Onyx stacks up.</h2>
+      <p>Against the systems most coatings contractors are already paying for.</p>
+    </div>
+    <div class="cmp-card card-reveal">
+      <div class="cmp-scroll">
+        <table class="cmp-table">
+          <thead>
+            <tr>
+              <td></td>
+              <th scope="col" class="c-ghl">GoHighLevel</th>
+              <th scope="col" class="c-job">Jobber</th>
+              <th scope="col" class="c-hcp">Housecall Pro</th>
+              <th scope="col" class="cmp-onyx">Onyx</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="--i:0">
+              <th scope="row">Built by coatings installers<small>By installers, for installers</small></th>
+              <td class="c-ghl"><span class="cmp-mark cmp-no"><span class="cmp-ic" role="img" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Marketing software</span></td>
+              <td class="c-job"><span class="cmp-mark cmp-no"><span class="cmp-ic" role="img" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span>General field service</span></td>
+              <td class="c-hcp"><span class="cmp-mark cmp-no"><span class="cmp-ic" role="img" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span>General field service</span></td>
+              <td class="cmp-onyx"><span class="cmp-mark cmp-yes"><span class="cmp-ic" role="img" aria-label="Yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>Yes</span></td>
+            </tr>
+            <tr style="--i:1">
+              <th scope="row">Built for coatings pricing<small>Quotes by m² or sq ft</small></th>
+              <td class="c-ghl"><span class="cmp-mark cmp-no"><span class="cmp-ic" role="img" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Generic</span></td>
+              <td class="c-job"><span class="cmp-mark cmp-no"><span class="cmp-ic" role="img" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Generic</span></td>
+              <td class="c-hcp"><span class="cmp-mark cmp-no"><span class="cmp-ic" role="img" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Generic</span></td>
+              <td class="cmp-onyx"><span class="cmp-mark cmp-yes"><span class="cmp-ic" role="img" aria-label="Yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>Yes</span></td>
+            </tr>
+            <tr style="--i:2">
+              <th scope="row">Flake, metallic &amp; quartz jobs<small>Each system quoted in minutes</small></th>
+              <td class="c-ghl"><span class="cmp-mark cmp-no"><span class="cmp-ic" role="img" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Generic</span></td>
+              <td class="c-job"><span class="cmp-mark cmp-no"><span class="cmp-ic" role="img" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Generic</span></td>
+              <td class="c-hcp"><span class="cmp-mark cmp-no"><span class="cmp-ic" role="img" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Generic</span></td>
+              <td class="cmp-onyx"><span class="cmp-mark cmp-yes"><span class="cmp-ic" role="img" aria-label="Yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>Yes</span></td>
+            </tr>
+            <tr style="--i:3">
+              <th scope="row">Automated follow-ups<small>On the cheapest plan</small></th>
+              <td class="c-ghl"><span class="cmp-mark cmp-yes"><span class="cmp-ic" role="img" aria-label="Yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>Not industry specific</span></td>
+              <td class="c-job"><span class="cmp-mark cmp-no"><span class="cmp-ic" role="img" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span>From the $139/mo plan</span></td>
+              <td class="c-hcp"><span class="cmp-mark cmp-no"><span class="cmp-ic" role="img" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></span>Top plan only, $329/mo</span></td>
+              <td class="cmp-onyx"><span class="cmp-mark cmp-yes"><span class="cmp-ic" role="img" aria-label="Yes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span>Included at $97/mo<small>Founding membership plan</small></span></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Competitor plan details checked on each vendor's own pricing page 2026-09-19.
+           Re-check before publishing - SaaS pricing moves. -->
+      <p class="cmp-source">Competitor plan details from each vendor's own pricing page, September 2026: <a href="https://www.gohighlevel.com/pricing" target="_blank" rel="noopener noreferrer">gohighlevel.com/pricing</a>, <a href="https://www.getjobber.com/pricing/" target="_blank" rel="noopener noreferrer">getjobber.com/pricing</a>, <a href="https://www.housecallpro.com/pricing/" target="_blank" rel="noopener noreferrer">housecallpro.com/pricing</a>.</p>
+    </div>
+  </div>
+</section>
+
 <section class="below" id="ghl">
   <div class="wrap">
     <div class="below-head reveal">
@@ -1190,7 +1360,7 @@ footer .fcol a:hover{opacity:1}
           <span class="value-check" role="img" aria-label="Included in Onyx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
         </div>
         <div class="value-row">
-          <span class="value-feature">Instant quoting by square metre</span>
+          <span class="value-feature">Instant quoting by <span data-unit="noun">square metre</span></span>
           <span class="value-cost">$39/mo</span>
           <span class="value-check" role="img" aria-label="Included in Onyx"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
         </div>
@@ -1247,10 +1417,437 @@ footer .fcol a:hover{opacity:1}
         </div>
         <p class="value-total-q">How much could you be saving with it all in one place?</p>
       </div>
-      <a class="btn btn-primary" href="#join">Join the waitlist</a>
     </div>
   </div>
 </section>
+
+<section class="below seq" id="founding-price">
+  <div class="wrap">
+    <div class="below-head reveal">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-label">FOUNDING PRICE</span><span class="eyebrow-line"></span></div>
+      <h2>Here's what Onyx costs.</h2>
+      <p>Founding members lock in 50% off, for life.</p>
+    </div>
+    <div class="ghl-card price-card card-reveal">
+      <div class="ghl-stats">
+        <div class="ghl-stat reveal">
+          <div class="ghl-stat-label ghl-them">RIGHT NOW</div>
+          <div class="ghl-stat-num ghl-them price-was"><s>$700+</s></div>
+          <div class="ghl-stat-sub">a month, across separate tools that don't talk to each other</div>
+        </div>
+        <div class="ghl-stat-div" aria-hidden="true"></div>
+        <div class="ghl-stat reveal">
+          <div class="ghl-stat-label">AS A FOUNDING MEMBER</div>
+          <div class="ghl-stat-num">$97</div>
+          <div class="ghl-stat-sub">a month, everything above included, locked for life</div>
+        </div>
+      </div>
+      <div class="tally"><span class="tally-chip" style="--i:0">CRM</span><span class="tally-chip" style="--i:1">Quoting</span><span class="tally-chip" style="--i:2">E-signatures</span><span class="tally-chip" style="--i:3">Scheduling</span><span class="tally-chip" style="--i:4">Follow-ups</span><span class="tally-chip" style="--i:5">Automation</span><span class="tally-chip" style="--i:6">Payments</span><span class="tally-chip" style="--i:7">Ad leads</span><span class="tally-chip" style="--i:8">Email &amp; SMS</span><span class="tally-chip" style="--i:9">Reviews</span><span class="tally-chip" style="--i:10">AI assistant</span><button type="button" class="tally-onyx" aria-label="Onyx, all of it, one system. Show the tools it replaces">Onyx &middot; all of it, one system<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg></button></div>
+      <div class="ghl-body">
+        <!-- $700+ (the #value total) - $97 = $603+/mo, $7,236+/yr -->
+        <p>That's <b>over $600 a month</b> back in your pocket, every month, for as long as you use Onyx. Over $7,200 a year.</p>
+      </div>
+      <a class="btn btn-primary" href="#join">Lock in $97/mo</a>
+    </div>
+  </div>
+</section>
+
+<section class="below seq" id="savings">
+  <div class="wrap">
+    <div class="below-head reveal">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-label">YOUR NUMBERS</span><span class="eyebrow-line"></span></div>
+      <h2>Work out your own saving.</h2>
+      <p>Put in what you spend on tools now and see what you'd keep.</p>
+    </div>
+    <div class="calc-card card-reveal">
+      <div class="calc-in">
+      <label class="calc-label" for="calcSpend">What you spend on tools each month</label>
+      <output class="calc-spend" id="calcSpendOut" for="calcSpend">$700<span>/mo</span></output>
+      <input class="calc-range" type="range" id="calcSpend" min="400" max="2000" step="10" value="700">
+      <div class="calc-scale" aria-hidden="true"><span>$400</span><span>$2,000</span></div>
+      </div>
+      <div class="calc-outp">
+      <div class="calc-stack" aria-hidden="true">
+        <p class="calc-stack-head">What your <b class="calc-stack-spend">$700</b>/mo becomes</p>
+        <div class="calc-stack-bar"><i class="calc-stack-onyx"></i><i class="calc-stack-save"></i></div>
+        <div class="calc-stack-legend">
+          <span class="lg-onyx"><em></em>Onyx <b>$97</b></span>
+          <span class="lg-save"><em></em>Saving <b class="calc-stack-saving">$603</b></span>
+        </div>
+      </div>
+      <div class="calc-results" aria-live="polite">
+        <div class="calc-result">
+          <span class="value-total-label">Saving each month</span>
+          <span class="value-total-num" id="calcMonthly">$603</span>
+        </div>
+        <div class="calc-result">
+          <span class="value-total-label">Saving each year</span>
+          <span class="value-total-num" id="calcYearly">$7,236</span>
+        </div>
+      </div>
+      <p class="calc-note">Compared with Onyx at $97/mo, the founding-member price.</p>
+      </div>
+      <a class="btn btn-primary calc-cta" href="#join">Lock in your savings now</a>
+    </div>
+  </div>
+</section>
+
+<section class="below seq" id="faq">
+  <div class="wrap">
+    <div class="faq-layout">
+    <div class="below-head reveal">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-label">FAQ</span><span class="eyebrow-line"></span></div>
+      <h2>Before you join.</h2>
+    </div>
+    <div class="faq-chat" hidden>
+      <div class="faq-thread" aria-live="polite"></div>
+      <div class="faq-chips" role="group" aria-label="Pick a question"></div>
+    </div>
+    <div class="faq-card card-reveal">
+      <div class="faq-list">
+        <details>
+          <summary>What happens to the price after the founding-member offer?<span class="plus" aria-hidden="true"></span></summary>
+          <p>Nothing changes for you. Founding members pay $97/mo, which is 50% off, and that price is locked in for life. It doesn't go up when the founding offer closes.</p>
+        </details>
+        <details>
+          <summary>When do I actually get access?<span class="plus" aria-hidden="true"></span></summary>
+          <p>We're inviting contractors in gradually, starting October 2026, in small batches rather than all at once. Join the waitlist and we'll reach out as spots open.</p>
+        </details>
+        <details>
+          <summary>Which coatings does Onyx support?<span class="plus" aria-hidden="true"></span></summary>
+          <p>At launch: epoxy coatings, spray crete, resin stone, resin crete and waterproofing.</p>
+        </details>
+        <details>
+          <summary>Can I quote in square feet?<span class="plus" aria-hidden="true"></span></summary>
+          <p>Yes. Onyx quotes in m² or ft², set once for your whole workspace.</p>
+        </details>
+        <details>
+          <summary>I'm on GoHighLevel. Can I bring my data across?<span class="plus" aria-hidden="true"></span></summary>
+          <p>Yes. Onyx can pull your contacts and pipelines straight from your GoHighLevel account. It's in limited early access while our GoHighLevel marketplace listing clears review.</p>
+        </details>
+        <!-- HELD until there's a real answer (don't fill with a guess):
+             - Is there a contract, or can I cancel anytime?  (cancellation / refund terms)
+             - Do I need to set anything up myself?           (what's automatic vs. a setup call/import)
+             - Moving from Jobber or Housecall Pro?           (what migration actually supports) -->
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<section class="below seq" id="outcomes">
+  <div class="wrap">
+    <div class="stat-bar card-reveal">
+      <div class="stat-item">
+        <div class="stat-num" data-stat="0"><span class="sr">&lt; 2 min</span><span class="stat-show" aria-hidden="true">&lt; 2 min</span></div>
+        <p class="stat-label">from a new lead to a quote sent</p>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-stat="1"><span class="sr">&lt; 1 hr</span><span class="stat-show" aria-hidden="true">&lt; 1 hr</span></div>
+        <p class="stat-label">before a quiet lead gets an automatic follow-up</p>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-stat="2"><span class="sr">$700+</span><span class="stat-show" aria-hidden="true">$700+</span></div>
+        <p class="stat-label">a month of separate tools, replaced by one system</p>
+      </div>
+      <!-- Room for a fourth stat once there's real pilot data (close-rate lift,
+           hours saved a week, jobs booked). Leave it out until then. -->
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  // Units toggle: swaps every [data-unit] phrase on the page between metric and
+  // imperial. Self-contained like the video/AI scripts. Defaults to metric (the
+  // page's own copy); a US browser starts on sq ft, and a choice is remembered.
+  var WORDS = { m:{ noun:'square metre', plural:'square metres' }, ft:{ noun:'square foot', plural:'square feet' } };
+  var KEY = 'onyx_unit';
+  var btns = document.querySelectorAll('[data-set-unit]');
+  if(!btns.length) return;
+  function apply(u){
+    document.querySelectorAll('[data-unit]').forEach(function(e){ e.textContent = WORDS[u][e.getAttribute('data-unit')]; });
+    btns.forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-set-unit')===u)); });
+  }
+  var start = null;
+  try{ start = localStorage.getItem(KEY); }catch(e){}
+  if(start!=='m' && start!=='ft') start = (navigator.language||'').toLowerCase()==='en-us' ? 'ft' : 'm';
+  if(start!=='m') apply(start);
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      var u = b.getAttribute('data-set-unit');
+      apply(u);
+      try{ localStorage.setItem(KEY, u); }catch(e){}
+    });
+  });
+})();
+
+(function(){
+  // Savings calculator: display only. Its call to action is a plain link to the
+  // #join waitlist page - it collects nothing itself.
+  var FOUNDING = 97;
+  var range = document.getElementById('calcSpend');
+  if(!range) return;
+  var out = document.getElementById('calcSpendOut');
+  var monthly = document.getElementById('calcMonthly');
+  var yearly = document.getElementById('calcYearly');
+  function money(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
+  function spend(){ return parseInt(range.value, 10) || 0; }
+  function update(){
+    var s = spend(), save = Math.max(0, s - FOUNDING);
+    var min = +range.min, max = +range.max;
+    out.innerHTML = money(s) + (s>=max ? '+' : '') + '<span>/mo</span>';
+    monthly.textContent = money(save);
+    yearly.textContent = money(save*12);
+    range.style.setProperty('--p', ((s-min)/(max-min)*100) + '%');
+    range.setAttribute('aria-valuetext', money(s) + ' a month');
+  }
+  range.addEventListener('input', update);
+  update();
+})();
+</script>
+
+<!-- ════ Section motion, 2026-09-19 ═══════════════════════════════════════════════
+     Gives each new section its own shape and entrance so they don't all read as the
+     same floating card: a flat table with one lifted Onyx column, a tally that gets
+     struck and collapses into one chip, a now-vs-Onyx bar chart, a chat-style FAQ,
+     and bare count-up numbers. Picked by Sam from A/B prototypes. Every section with
+     .seq gets .is-on while it's in view (both ways, like the page's own reveals),
+     and everything lands in its finished state for reduced-motion visitors. No
+     waitlist/calculator logic lives here - the calculator script is untouched. -->
+<style>
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ── Side by side: flat table on the page's own atmosphere; only the Onyx column is a lifted card ── */
+#compare .cmp-card{background:transparent;box-shadow:none;padding:0;border-radius:0}
+/* overflow visible on desktop: the lifted column pokes out of the table by design, and
+   inside a scroll box that showed up as a stray scrollbar beside the table */
+#compare .cmp-scroll{border:0;border-radius:0;padding:1.6rem 0 1.1rem;overflow:visible}
+#compare .cmp-table thead th{background:transparent}
+#compare .cmp-table th,#compare .cmp-table td{border-bottom-color:color-mix(in srgb,var(--text) 14%,transparent)}
+#compare .cmp-table thead th{color:var(--text);border-bottom:2px solid color-mix(in srgb,var(--text) 22%,transparent)}
+#compare .cmp-table tbody th,#compare .cmp-table tbody td:not(.cmp-onyx){background:color-mix(in srgb,var(--card) 62%,transparent)}
+#compare .cmp-table tbody tr:first-child th{border-top-left-radius:12px}
+#compare .cmp-table tbody tr:last-child th{border-bottom-left-radius:12px}
+#compare .cmp-table td{color:var(--text)}
+#compare .cmp-table .cmp-onyx{background:transparent;position:relative;z-index:1;border-bottom-color:transparent;box-shadow:none}
+#compare .cmp-table th.cmp-onyx{color:var(--accent)}
+#compare .cmp-no .cmp-ic{background:#D93025;border-color:#D93025;color:#fff}
+/* --cmp-h (the table's height) is set by the script below so the card spans every row */
+#compare th.cmp-onyx::before{content:"";position:absolute;left:0;right:0;top:-.7rem;height:calc(var(--cmp-h,100%) + 1.4rem);background:var(--card);border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:16px;box-shadow:var(--shadow-lg);z-index:-1;opacity:0;transform:scale(.97);transform-origin:top center;transition:opacity .6s ease,transform .7s cubic-bezier(.16,1,.3,1)}
+#compare th.cmp-onyx::after{content:"BUILT FOR THIS TRADE";position:absolute;top:-1.35rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-family:var(--mono);font-size:.56rem;letter-spacing:.1em;padding:.22rem .5rem;border-radius:5px;white-space:nowrap;opacity:0;transition:opacity .4s ease .5s}
+#compare.is-on th.cmp-onyx::before{opacity:1;transform:none}
+#compare.is-on th.cmp-onyx::after{opacity:1}
+#compare tbody .cmp-no,#compare tbody td.c-ghl .cmp-yes{opacity:0;transform:translateY(6px);transition:opacity .45s ease,transform .45s ease;transition-delay:calc(var(--i)*150ms + 250ms)}
+#compare tbody .cmp-onyx .cmp-ic{transform:scale(0);transition:transform .5s cubic-bezier(.175,.885,.32,1.275);transition-delay:calc(var(--i)*150ms + 520ms)}
+#compare.is-on tbody .cmp-no,#compare.is-on tbody td.c-ghl .cmp-yes{opacity:1;transform:none}
+#compare.is-on tbody .cmp-onyx .cmp-ic{transform:none}
+@media(max-width:700px){
+  #compare .cmp-table .cmp-onyx{position:sticky}
+  #compare .cmp-scroll{overflow-x:auto;overflow-y:hidden;padding-bottom:1.6rem}
+}
+
+/* ── Founding price: the tools tally up, the total is struck, they collapse into one Onyx chip ── */
+.tally{position:relative;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.4rem;max-width:560px;min-height:4.4rem;margin:0 auto clamp(1.5rem,4vw,2rem)}
+.tally-chip{font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:#178A43;border:1px solid #178A43;font-weight:600;border-radius:999px;padding:.3rem .65rem;opacity:0}
+.tally-onyx{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.6);opacity:0;white-space:nowrap;font-weight:600;font-size:.9rem;color:#fff;background:var(--accent);border-radius:999px;padding:.55rem 1.1rem;box-shadow:0 8px 20px -6px rgba(30,123,255,.45)}
+#founding-price.is-on .tally-chip{animation:chipLife 3.4s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--i)*80ms)}
+#founding-price.is-on .tally-onyx{animation:onyxIn .65s cubic-bezier(.175,.885,.32,1.275) 3.3s both}
+@keyframes chipLife{0%{opacity:0;transform:scale(.7)}14%{opacity:1;transform:none}72%{opacity:1;transform:none}100%{opacity:0;transform:scale(.3)}}
+/* after it lands, the Onyx chip is clickable: it opens the tools back up so they can be read,
+   and they stay open (no replay on scroll). Not clickable mid-animation - .ready is added on animationend. */
+.tally-onyx{display:inline-flex;align-items:center;gap:.45rem;border:0;font-family:var(--body);cursor:default;pointer-events:none;transition:background .15s ease,box-shadow .15s ease}
+.tally-onyx svg{width:.95em;height:.95em;opacity:.85}
+.tally-onyx.ready{cursor:pointer;pointer-events:auto}
+.tally-onyx.ready:hover{background:var(--accent-press);box-shadow:0 10px 24px -6px rgba(30,123,255,.55)}
+.tally-onyx:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.tally.open .tally-chip{animation:chipBack .45s cubic-bezier(.175,.885,.32,1.275) both!important;animation-delay:calc(var(--i)*45ms)!important;display:block}
+.tally.open .tally-onyx{display:none}
+@keyframes chipBack{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+@keyframes onyxIn{from{opacity:0;transform:translate(-50%,-50%) scale(.6)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+#founding-price .price-card .ghl-stat-num.price-was{color:#9AA2AC;transition:color .35s ease 1.15s}
+#founding-price.is-on .price-card .ghl-stat-num.price-was{color:#D93025}
+#founding-price .price-was s{text-decoration:none;position:relative;font-variant-numeric:tabular-nums}
+#founding-price .price-was s::after{content:"";position:absolute;left:-4%;right:-4%;top:50%;height:.075em;background:currentColor;border-radius:9px;transform:scaleX(0);transform-origin:left;transition:transform .45s cubic-bezier(.22,1,.36,1) 1.15s}
+#founding-price.is-on .price-was s::after{transform:none}
+#founding-price .ghl-stat-num:not(.price-was){opacity:0;transform:translateY(-18px);transition:opacity .4s ease 1.6s,transform .55s cubic-bezier(.175,.885,.32,1.275) 1.6s}
+#founding-price.is-on .ghl-stat-num:not(.price-was){opacity:1;transform:none}
+
+/* ── Your numbers: controls on the left, a bar that shrinks from "now" to "with Onyx" on the right ── */
+#savings .calc-card{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem clamp(1.5rem,4vw,3rem);max-width:900px;align-items:center}
+#savings .calc-card>:not(.calc-in):not(.calc-outp){grid-column:1/-1}
+#savings .calc-label,#savings .calc-spend{text-align:left}
+#savings .calc-outp{border-left:1px solid var(--line);padding-left:clamp(1.5rem,4vw,3rem)}
+#savings .calc-note{text-align:left}
+#savings .calc-cta{justify-self:center;margin-top:.4rem;padding:.85rem 1.8rem}
+#savings .calc-results{margin-top:0}
+/* one bar = what you spend now; the blue slice is Onyx's $97, the green rest is the saving.
+   Green is the same bold green as the Founding price tally. */
+.calc-stack{margin-bottom:1.2rem}
+.calc-stack-head{margin:0 0 .6rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.calc-stack-head b{color:var(--text);font-variant-numeric:tabular-nums}
+.calc-stack-bar{display:flex;gap:3px;height:18px;border-radius:99px;overflow:hidden;background:var(--subtle)}
+.calc-stack-bar i{display:block;height:100%;transition:width .9s cubic-bezier(.22,1,.36,1)}
+.calc-stack-onyx{background:var(--accent);flex:none}
+.calc-stack-save{background:#178A43;flex:1 1 auto}
+#savings:not(.is-on) .calc-stack-bar i{width:0!important;flex:0 0 0!important}
+.calc-stack-legend{display:flex;flex-wrap:wrap;gap:.4rem 1.25rem;margin-top:.65rem;font-size:.85rem;color:var(--muted)}
+.calc-stack-legend span{display:inline-flex;align-items:center;gap:.4rem}
+.calc-stack-legend em{width:.7rem;height:.7rem;border-radius:3px;flex:none}
+.lg-onyx em{background:var(--accent)} .lg-save em{background:#178A43}
+.calc-stack-legend b{color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
+@media(max-width:760px){
+  #savings .calc-card{grid-template-columns:1fr}
+  #savings .calc-outp{border-left:0;padding-left:0}
+}
+
+/* ── FAQ: a chat thread - tap a question, it posts as your message, the answer types back.
+   The <details> list stays in the page as the no-JS fallback and the single source of
+   the copy; the script builds the chips from it and only then swaps the chat in. ── */
+.faq-chat{max-width:640px;margin:0 auto}
+.faq-thread{display:flex;flex-direction:column;gap:.65rem;min-height:12rem;margin-bottom:1.4rem}
+.faq-msg{max-width:84%;font-size:.95rem;line-height:1.55;padding:.75rem 1.05rem;animation:msgIn .45s cubic-bezier(.175,.885,.32,1.275) both}
+.faq-msg-q{align-self:flex-end;background:var(--accent);color:#fff;border-radius:18px 18px 5px 18px}
+.faq-msg-a{align-self:flex-start;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:18px 18px 18px 5px;color:var(--text)}
+.faq-msg-a .ai-reply-badge{display:flex;margin-bottom:.3rem}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+.faq-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem}
+.faq-chips button{font-family:var(--body);font-size:.88rem;font-weight:600;color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.55rem .95rem;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s ease,color .15s ease,transform .12s ease,opacity .2s ease}
+.faq-chips button:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.faq-chips button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.faq-chips button[disabled]{opacity:.4;cursor:default;transform:none;border-color:var(--line);color:var(--muted)}
+
+/* ── Outcomes: no card - big numbers straight on the page, counting in, a blue rule drawing underneath ── */
+#outcomes .stat-bar{background:transparent;box-shadow:none;border-radius:0;overflow:visible;position:relative;padding-bottom:1.6rem}
+#outcomes .stat-item{border-color:transparent}
+#outcomes .stat-num{font-size:clamp(2.8rem,6.5vw,4rem);font-variant-numeric:tabular-nums}
+#outcomes .stat-bar::after{content:"";position:absolute;left:8%;right:8%;bottom:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);transform:scaleX(0);transition:transform 2.4s cubic-bezier(.22,1,.36,1) .3s}
+#outcomes.is-on .stat-bar::after{transform:none}
+
+@media(prefers-reduced-motion:reduce){
+  .seq *,.seq *::before,.seq *::after{transition:none!important;animation:none!important}
+  .tally-chip{display:none}
+  .tally-onyx{opacity:1;transform:translate(-50%,-50%)}
+}
+</style>
+<script>
+(function(){
+  // Section entrances for the .seq sections above. Self-contained like the page's
+  // other section scripts; toggles .is-on both ways so an entrance replays when you
+  // scroll back to it, same as the page's own below-hero reveals.
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hooks = {};
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(en){
+      var sec = en.target, on = en.isIntersecting;
+      if(on === sec.classList.contains('is-on')) return;
+      sec.classList.toggle('is-on', on);
+      if(on && hooks[sec.id]) hooks[sec.id](sec);
+    });
+  }, { threshold:.3 });
+
+  // Side by side: size the lifted Onyx column to the table
+  var table = document.querySelector('#compare .cmp-table');
+  function sizeLift(){ if(table) table.style.setProperty('--cmp-h', table.offsetHeight + 'px'); }
+  addEventListener('resize', sizeLift); sizeLift();
+  hooks.compare = sizeLift;
+
+  // Founding price: count the old total up before it's struck
+  hooks['founding-price'] = function(sec){
+    if(reduce) return;
+    var s = sec.querySelector('.price-was s'); if(!s) return;
+    var t0 = performance.now(), dur = 1000;
+    (function tick(now){
+      var k = Math.min(1,(now-t0)/dur), v = Math.round(700*(1-Math.pow(1-k,3)));
+      s.textContent = '$' + v + (k===1 ? '+' : '');
+      if(k<1) requestAnimationFrame(tick);
+    })(t0);
+  };
+
+  // Founding price: the Onyx chip opens the tools back up once its entrance is done
+  var tally = document.querySelector('#founding-price .tally'), onyxChip = tally && tally.querySelector('.tally-onyx');
+  if(onyxChip){
+    onyxChip.addEventListener('animationend', function(e){ if(e.animationName==='onyxIn') onyxChip.classList.add('ready'); });
+    if(reduce) onyxChip.classList.add('ready');
+    onyxChip.addEventListener('click', function(){
+      if(!onyxChip.classList.contains('ready')) return;
+      tally.classList.add('open');
+      var first = tally.querySelector('.tally-chip'); if(first){ first.setAttribute('tabindex','-1'); first.focus({preventScroll:true}); }
+    });
+  }
+
+  // Your numbers: the two bars follow the slider (the calculator's own maths is untouched)
+  var range = document.getElementById('calcSpend');
+  if(range){
+    var onyxSeg = document.querySelector('.calc-stack-onyx');
+    var spendEl = document.querySelector('.calc-stack-spend'), saveEl = document.querySelector('.calc-stack-saving');
+    var bars = function(){
+      var v = parseInt(range.value,10)||0;
+      onyxSeg.style.width = Math.min(100, 97/v*100) + '%';
+      spendEl.textContent = '$' + v.toLocaleString('en-US') + (v>=+range.max ? '+' : '');
+      saveEl.textContent = '$' + Math.max(0, v-97).toLocaleString('en-US');
+    };
+    range.addEventListener('input', bars); bars();
+  }
+
+  // FAQ: chips built from the real <details> list, so the copy lives in one place
+  var faq = document.getElementById('faq');
+  if(faq){
+    var chat = faq.querySelector('.faq-chat'), list = faq.querySelector('.faq-card');
+    var thread = faq.querySelector('.faq-thread'), chipsBox = faq.querySelector('.faq-chips');
+    var items = [].map.call(faq.querySelectorAll('.faq-list details'), function(d){
+      return { q: d.querySelector('summary').textContent.trim(), a: d.querySelector('p').textContent.trim() };
+    });
+    var busy = false, started = false;
+    items.forEach(function(it){
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = it.q;
+      b.addEventListener('click', function(){ ask(it, b); });
+      it.btn = b; chipsBox.appendChild(b);
+    });
+    chat.hidden = false; list.hidden = true;
+    function ask(it, b){
+      if(busy || b.disabled) return; busy = true; b.disabled = true;
+      var q = document.createElement('div'); q.className = 'faq-msg faq-msg-q'; q.textContent = it.q; thread.appendChild(q);
+      var a = document.createElement('div'); a.className = 'faq-msg faq-msg-a';
+      a.innerHTML = '<span class="ai-reply-badge">onyx</span><span class="faq-a-text"></span>';
+      var out = a.querySelector('.faq-a-text');
+      setTimeout(function(){
+        thread.appendChild(a);
+        if(reduce){ out.textContent = it.a; busy = false; return; }
+        var i = 0;
+        (function step(){ out.textContent = it.a.slice(0, i); if(i < it.a.length){ i += 2; setTimeout(step, 14); } else { out.textContent = it.a; busy = false; } })();
+      }, reduce ? 0 : 450);
+    }
+    // the first question asks itself the first time the section comes into view
+    hooks.faq = function(){ if(!started && items[0]){ started = true; ask(items[0], items[0].btn); } };
+  }
+
+  // Outcomes: each number runs up to its real value (screen readers get the .sr text)
+  var runs = [
+    function(k){ var s = Math.round(119*k); return Math.floor(s/60) + ':' + ('0'+(s%60)).slice(-2); }, // stopwatch to 1:59
+    function(k){ return Math.round(59*k) + ' min'; },
+    function(k){ return '$' + Math.round(700*k); }
+  ];
+  hooks.outcomes = function(sec){
+    if(reduce) return;
+    sec.querySelectorAll('.stat-num').forEach(function(n){
+      var show = n.querySelector('.stat-show'), final = n.querySelector('.sr').textContent, f = runs[+n.getAttribute('data-stat')];
+      var t0 = performance.now(), dur = 2400, id = (n._run = (n._run||0) + 1);
+      (function tick(now){
+        if(n._run !== id) return;
+        var k = Math.min(1,(now-t0)/dur);
+        show.textContent = k<1 ? f(1-Math.pow(1-k,3)) : final;
+        if(k<1) requestAnimationFrame(tick);
+      })(t0);
+    });
+  };
+
+  document.querySelectorAll('section.seq').forEach(function(sec){
+    if(reduce){ sec.classList.add('is-on'); if(hooks[sec.id]) hooks[sec.id](sec); }
+    else io.observe(sec);
+  });
+})();
+</script>
 
 <section class="below" id="final-cta">
   <div class="wrap">
@@ -1326,7 +1923,7 @@ footer .fcol a:hover{opacity:1}
 
 <section id="thanks" class="thanks-view" aria-label="You've joined the waitlist">
   <div class="join-inner">
-    <span class="badge"><span class="badge-dot"></span> Founding member <b id="wlPos">18</b></span>
+    <span class="badge"><span class="badge-dot"></span> Founding member <b id="wlPos"></b></span>
     <h1 class="thanks-h1">You're officially in line!<br><span class="accent">50% OFF FOR LIFE UNLOCKED</span></h1>
     <p class="lede">We'll begin rolling out access in small groups starting October 2026. Keep an eye on your inbox, we'll reach out as spots open.</p>
     <div class="thanks-cta">
@@ -1487,12 +2084,19 @@ footer .fcol a:hover{opacity:1}
     wlShow(wlCached());
   }
 
+  // #thanks badge: follows the same count the hero shows (it used to be a
+  // hardcoded 18 that disagreed with the hero). Once this visitor signs up,
+  // finish() below pins it to their own position and it stops following.
+  var wlJoined=false;
+  function wlSyncPos(n){ var p=document.getElementById('wlPos'); if(p && !wlJoined) p.textContent=Number(n).toLocaleString(); }
+  wlSyncPos(wlCached());
+
   var wlGotLive=false;
   function refreshCount(){
     if(!liveMode) return;
     fetch(WEBAPP_URL,{method:'GET'})
       .then(function(r){return r.json()})
-      .then(function(d){ if(d && typeof d.count==='number'){ wlGotLive=true; wlStore(d.count); wlShow(d.count); } })
+      .then(function(d){ if(d && typeof d.count==='number'){ wlGotLive=true; wlStore(d.count); wlShow(d.count); wlSyncPos(d.count); } })
       .catch(function(){});
   }
   refreshCount();
@@ -1569,6 +2173,7 @@ footer .fcol a:hover{opacity:1}
       function finish(n){                       // success → thanks page
         wlStore(n); wlShow(n);
         var p=document.getElementById('wlPos'); if(p) p.textContent=Number(n).toLocaleString();
+        wlJoined=true;
         location.hash='#thanks';
         if(btn){ btn.disabled=false; btn.textContent='CLAIM 50% OFF FOR LIFE'; }
       }
