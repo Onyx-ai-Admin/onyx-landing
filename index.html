@@ -2080,8 +2080,9 @@ body.route-thanks .nav-cta{visibility:hidden}
   // first paint, since the element starts empty) rather than snapping - each
   // call gets its own token so a fast update (e.g. the 20s poll) cancels any
   // still-running animation on that element instead of the two fighting.
+  var wlTarget=null;
   function wlShow(n){
-    n=Number(n);
+    n=Number(n); wlTarget=n;
     document.querySelectorAll('[data-wl-count]').forEach(function(e){
       var from=parseInt((e.textContent||'').replace(/,/g,''),10);
       if(isNaN(from))from=0;
@@ -2099,25 +2100,19 @@ body.route-thanks .nav-cta{visibility:hidden}
       });
     });
   }
-  // A first-ever visit (nothing cached) starts from 0 so the live count's arrival
-  // is a satisfying roll-up; a returning visitor already has a trustworthy cached
-  // number, so it paints straight away instead of replaying 0-to-N on every visit.
-  // Either way, refreshCount() below drives the one real animation. This used to
+  // Every visit rolls up from 0, returning visitors included (2026-09-23): the
+  // roll IS the effect, and painting a cached number straight away meant anyone
+  // who had been here before never saw it. The roll starts immediately against
+  // the cached number so it never waits on the network; if the live count that
+  // arrives differs, wlShow just re-targets the same animation. This used to
   // animate to the hardcoded fallback on its own fixed 2.2s timer and only THEN
   // fetch the live count - but the Apps Script endpoint 302s to its real execution
   // URL before it responds (~3s round trip, measured), so the fallback animation
   // routinely finished and sat still for a second or more before jumping to the
   // real number. Outside live mode (preview/offline) no fetch is ever coming, so
   // that path keeps its own animated fallback.
-  if(liveMode){
-    var hadCache = !isNaN(parseInt(localStorage.getItem(WL_KEY),10));
-    document.querySelectorAll('[data-wl-count]').forEach(function(e){
-      e.textContent = hadCache ? wlCached().toLocaleString() : '0';
-    });
-  }else{
-    document.querySelectorAll('[data-wl-count]').forEach(function(e){ e.textContent='0'; });
-    wlShow(wlCached());
-  }
+  document.querySelectorAll('[data-wl-count]').forEach(function(e){ e.textContent='0'; });
+  wlShow(wlCached());
 
   // #thanks badge: follows the same count the hero shows (it used to be a
   // hardcoded 18 that disagreed with the hero). Once this visitor signs up,
@@ -2131,7 +2126,7 @@ body.route-thanks .nav-cta{visibility:hidden}
     if(!liveMode) return;
     fetch(WEBAPP_URL,{method:'GET'})
       .then(function(r){return r.json()})
-      .then(function(d){ if(d && typeof d.count==='number'){ wlGotLive=true; wlStore(d.count); wlShow(d.count); wlSyncPos(d.count); } })
+      .then(function(d){ if(d && typeof d.count==='number'){ wlGotLive=true; wlStore(d.count); if(d.count!==wlTarget) wlShow(d.count); wlSyncPos(d.count); } })
       .catch(function(){});
   }
   refreshCount();
@@ -2139,7 +2134,7 @@ body.route-thanks .nav-cta{visibility:hidden}
   // Safety net for a slow/failed first fetch: 4s is comfortably past the normal
   // ~3s round trip, so this is a no-op on a normal load and only rescues a
   // visitor who'd otherwise stare at 0 with no backend response in sight.
-  if(liveMode) setTimeout(function(){ if(!wlGotLive) wlShow(wlCached()); }, 4000);
+  if(liveMode) setTimeout(function(){ if(!wlGotLive && wlCached()!==wlTarget) wlShow(wlCached()); }, 4000);
 
   var form=document.getElementById('wlForm');
   if(form){
