@@ -1201,7 +1201,6 @@ body.route-thanks .nav-cta{visibility:hidden}
    have to swipe to find. Its backgrounds are already opaque mixes. */
 @media(max-width:700px){
   .cmp-table{min-width:600px}
-  .cmp-table .cmp-onyx{position:sticky;right:0;z-index:1;box-shadow:-10px 0 14px -10px rgba(20,22,27,.18);min-width:9.5rem}
 }
 .cmp-source{margin-top:1rem;font-size:.8rem;color:var(--muted);text-align:center;line-height:1.55}
 .cmp-source a{color:var(--muted);text-underline-offset:3px}
@@ -1221,7 +1220,7 @@ body.route-thanks .nav-cta{visibility:hidden}
 .calc-spend span{font-size:.4em;color:var(--muted);font-weight:500;letter-spacing:0;margin-left:.15rem}
 /* track + fill mirror the waitlist .meter bar in the head block */
 .calc-range{-webkit-appearance:none;appearance:none;display:block;width:100%;height:8px;border-radius:99px;margin:1.6rem 0 0;cursor:pointer;
-  background:linear-gradient(var(--accent),var(--accent)) 0 0/var(--p,18.75%) 100% no-repeat,color-mix(in srgb,var(--text) 12%,transparent)}
+  background:linear-gradient(var(--accent),var(--accent)) 0 0/var(--p,27.8%) 100% no-repeat,color-mix(in srgb,var(--text) 12%,transparent)}
 .calc-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--card);border:2px solid var(--accent);box-shadow:var(--shadow)}
 .calc-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--card);border:2px solid var(--accent);box-shadow:var(--shadow)}
 .calc-range:focus-visible{outline:2px solid var(--accent);outline-offset:6px}
@@ -1262,6 +1261,7 @@ body.route-thanks .nav-cta{visibility:hidden}
     </div>
     <div class="cmp-card card-reveal">
       <div class="cmp-scroll">
+        <div class="cmp-fit">
         <table class="cmp-table">
           <thead>
             <tr>
@@ -1303,6 +1303,7 @@ body.route-thanks .nav-cta{visibility:hidden}
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
       <!-- Competitor plan details checked on each vendor's own pricing page 2026-09-19.
            Re-check before publishing - SaaS pricing moves. -->
@@ -1463,8 +1464,8 @@ body.route-thanks .nav-cta{visibility:hidden}
       <div class="calc-in">
       <label class="calc-label" for="calcSpend">What you spend on tools each month</label>
       <output class="calc-spend" id="calcSpendOut" for="calcSpend">$700<span>/mo</span></output>
-      <input class="calc-range" type="range" id="calcSpend" min="400" max="2000" step="10" value="700">
-      <div class="calc-scale" aria-hidden="true"><span>$400</span><span>$2,000</span></div>
+      <input class="calc-range" type="range" id="calcSpend" min="200" max="2000" step="10" value="700">
+      <div class="calc-scale" aria-hidden="true"><span>$200</span><span>$2,000</span></div>
       </div>
       <div class="calc-outp">
       <div class="calc-stack" aria-hidden="true">
@@ -1622,7 +1623,8 @@ body.route-thanks .nav-cta{visibility:hidden}
 #compare .cmp-card{background:transparent;box-shadow:none;padding:0;border-radius:0}
 /* overflow visible on desktop: the lifted column pokes out of the table by design, and
    inside a scroll box that showed up as a stray scrollbar beside the table */
-#compare .cmp-scroll{border:0;border-radius:0;padding:1.6rem 0 1.1rem;overflow:visible}
+#compare .cmp-scroll{border:0;border-radius:0;padding:0;overflow:visible}
+#compare .cmp-fit{padding:1.6rem 0 1.1rem}
 #compare .cmp-table thead th{background:transparent}
 #compare .cmp-table th,#compare .cmp-table td{border-bottom-color:color-mix(in srgb,var(--text) 14%,transparent)}
 #compare .cmp-table thead th{color:var(--text);border-bottom:2px solid color-mix(in srgb,var(--text) 22%,transparent)}
@@ -1642,9 +1644,25 @@ body.route-thanks .nav-cta{visibility:hidden}
 #compare tbody .cmp-onyx .cmp-ic{transform:scale(0);transition:transform .5s cubic-bezier(.175,.885,.32,1.275);transition-delay:calc(var(--i)*150ms + 520ms)}
 #compare.is-on tbody .cmp-no,#compare.is-on tbody td.c-ghl .cmp-yes{opacity:1;transform:none}
 #compare.is-on tbody .cmp-onyx .cmp-ic{transform:none}
+/* Phone: the same desktop table, scaled down to fit the screen, rather than a
+   sideways-scrolling one with the Onyx column pinned over the competitors (which
+   clipped their text). The script below sets the scale and the box's height from
+   the real table width. Type is sized up here so it stays legible once scaled. */
 @media(max-width:700px){
-  #compare .cmp-table .cmp-onyx{position:sticky}
-  #compare .cmp-scroll{overflow-x:auto;overflow-y:hidden;padding-bottom:1.6rem}
+  #compare .cmp-scroll{overflow:hidden;padding:0}
+  #compare .cmp-fit{width:600px;transform-origin:top left}
+  #compare .cmp-table{min-width:0;table-layout:fixed}
+  #compare .cmp-table tbody th{width:25%}
+  #compare .cmp-table{font-size:1.1rem;line-height:1.35}
+  #compare .cmp-table th,#compare .cmp-table td{padding:.9rem .55rem}
+  #compare .cmp-table small{font-size:.86rem;margin-top:.25rem}
+  #compare .cmp-table thead th{font-size:.78rem;letter-spacing:.04em}
+  #compare .cmp-ic{width:1.3rem;height:1.3rem}
+  #compare .cmp-ic svg{width:.7rem;height:.7rem}
+  /* the tag is wider than its column: anchor it to the column's right edge so it
+     extends inwards instead of past the table and getting clipped */
+  #compare th.cmp-onyx::after{font-size:.72rem;top:-1.7rem;padding:.3rem .55rem;left:auto;right:0;transform:none}
+  #compare th.cmp-onyx::before{border-radius:20px}
 }
 
 /* ── Founding price: the tools tally up, the total is struck, they collapse into one Onyx chip ── */
@@ -1748,8 +1766,22 @@ body.route-thanks .nav-cta{visibility:hidden}
 
   // Side by side: size the lifted Onyx column to the table
   var table = document.querySelector('#compare .cmp-table');
-  function sizeLift(){ if(table) table.style.setProperty('--cmp-h', table.offsetHeight + 'px'); }
+  var fit = document.querySelector('#compare .cmp-fit'), box = document.querySelector('#compare .cmp-scroll');
+  function sizeLift(){
+    if(!table) return;
+    table.style.setProperty('--cmp-h', table.offsetHeight + 'px');
+    if(!fit || !box) return;
+    if(matchMedia('(max-width:700px)').matches){
+      var s = Math.min(1, box.clientWidth / fit.offsetWidth);  // fit lays out at its design width, then scales to the screen
+      fit.style.transform = 'scale(' + s + ')';
+      box.style.height = Math.ceil(fit.offsetHeight * s) + 'px';
+    } else {
+      fit.style.transform = ''; box.style.height = '';
+    }
+  }
   addEventListener('resize', sizeLift); sizeLift();
+  // webfonts land after first paint and change the table's height
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(sizeLift);
   hooks.compare = sizeLift;
 
   // Founding price: count the old total up before it's struck
