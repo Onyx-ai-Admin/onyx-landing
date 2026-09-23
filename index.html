@@ -1644,25 +1644,37 @@ body.route-thanks .nav-cta{visibility:hidden}
 #compare tbody .cmp-onyx .cmp-ic{transform:scale(0);transition:transform .5s cubic-bezier(.175,.885,.32,1.275);transition-delay:calc(var(--i)*150ms + 520ms)}
 #compare.is-on tbody .cmp-no,#compare.is-on tbody td.c-ghl .cmp-yes{opacity:1;transform:none}
 #compare.is-on tbody .cmp-onyx .cmp-ic{transform:none}
-/* Phone: the same desktop table, scaled down to fit the screen, rather than a
-   sideways-scrolling one with the Onyx column pinned over the competitors (which
-   clipped their text). The script below sets the scale and the box's height from
-   the real table width. Type is sized up here so it stays legible once scaled. */
+/* Phone: the table becomes one card per feature - Onyx's answer on top in blue,
+   the three competitors listed under it. Same content and same components as the
+   desktop table (this is the same markup restyled), just a shape that fits a phone
+   at full size instead of a five-column table scaled down until it's dense. */
 @media(max-width:700px){
-  #compare .cmp-scroll{overflow:hidden;padding:0}
-  #compare .cmp-fit{width:600px;transform-origin:top left}
-  #compare .cmp-table{min-width:0;table-layout:fixed}
-  #compare .cmp-table tbody th{width:25%}
-  #compare .cmp-table{font-size:1.1rem;line-height:1.35}
-  #compare .cmp-table th,#compare .cmp-table td{padding:.9rem .55rem}
-  #compare .cmp-table small{font-size:.86rem;margin-top:.25rem}
-  #compare .cmp-table thead th{font-size:.78rem;letter-spacing:.04em}
-  #compare .cmp-ic{width:1.3rem;height:1.3rem}
-  #compare .cmp-ic svg{width:.7rem;height:.7rem}
-  /* the tag is wider than its column: anchor it to the column's right edge so it
-     extends inwards instead of past the table and getting clipped */
-  #compare th.cmp-onyx::after{font-size:.72rem;top:-1.7rem;padding:.3rem .55rem;left:auto;right:0;transform:none}
-  #compare th.cmp-onyx::before{border-radius:20px}
+  #compare .cmp-scroll{overflow:visible;padding:0}
+  #compare .cmp-fit{width:auto;transform:none!important;padding:0}
+  #compare .cmp-table{display:block;min-width:0;font-size:1rem}
+  #compare .cmp-table thead{display:none}
+  #compare .cmp-table tbody{display:block}
+  #compare .cmp-table tbody tr{display:flex;flex-direction:column;background:var(--card);border-radius:18px;box-shadow:var(--shadow-lg);padding:1.2rem 1.25rem 1.05rem;margin-bottom:1rem}
+  #compare .cmp-table tbody tr:last-child{margin-bottom:0}
+  #compare .cmp-table th,#compare .cmp-table td{display:block;width:auto;padding:0;border:0;background:transparent}
+  #compare .cmp-table tbody th{order:-2;font-size:1.08rem;font-weight:650;letter-spacing:-.01em;color:var(--text);border-radius:0;margin-bottom:.95rem}
+  #compare .cmp-table tbody th small{font-size:.86rem;margin-top:.25rem}
+  /* Onyx first, in the brand's own block */
+  #compare .cmp-table td.cmp-onyx{order:-1;display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;
+    background:color-mix(in srgb,var(--accent) 8%,var(--card));border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line));
+    border-radius:12px;padding:.75rem .9rem;margin-bottom:1rem;position:static;box-shadow:none}
+  #compare .cmp-table td.cmp-onyx::before{content:"onyx";font-family:var(--mono);font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600;flex:none;margin-top:.22rem}
+  #compare .cmp-table td.cmp-onyx .cmp-mark{text-align:right;justify-content:flex-end}
+  #compare .cmp-table td.cmp-onyx small{text-align:right}
+  /* the three competitors, one per line */
+  #compare .cmp-table tbody td:not(.cmp-onyx){display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:.6rem 0;border-top:1px solid var(--line)}
+  #compare .cmp-table tbody td:not(.cmp-onyx)::before{font-size:.95rem;color:var(--muted);flex:none}
+  #compare .c-ghl::before{content:"GoHighLevel"}
+  #compare .c-job::before{content:"Jobber"}
+  #compare .c-hcp::before{content:"Housecall Pro"}
+  #compare .cmp-table tbody td .cmp-mark{max-width:60%;text-align:left}
+  #compare th.cmp-onyx::before,#compare th.cmp-onyx::after{display:none}
+}
 }
 
 /* ── Founding price: the tools tally up, the total is struck, they collapse into one Onyx chip ── */
@@ -1766,18 +1778,9 @@ body.route-thanks .nav-cta{visibility:hidden}
 
   // Side by side: size the lifted Onyx column to the table
   var table = document.querySelector('#compare .cmp-table');
-  var fit = document.querySelector('#compare .cmp-fit'), box = document.querySelector('#compare .cmp-scroll');
   function sizeLift(){
     if(!table) return;
     table.style.setProperty('--cmp-h', table.offsetHeight + 'px');
-    if(!fit || !box) return;
-    if(matchMedia('(max-width:700px)').matches){
-      var s = Math.min(1, box.clientWidth / fit.offsetWidth);  // fit lays out at its design width, then scales to the screen
-      fit.style.transform = 'scale(' + s + ')';
-      box.style.height = Math.ceil(fit.offsetHeight * s) + 'px';
-    } else {
-      fit.style.transform = ''; box.style.height = '';
-    }
   }
   addEventListener('resize', sizeLift); sizeLift();
   // webfonts land after first paint and change the table's height
