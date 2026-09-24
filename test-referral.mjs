@@ -20,6 +20,15 @@ await p.goto('http://localhost:4599/?ref=enrique')
 const stored = await p.evaluate(()=>localStorage.getItem('onyx_ref'))
 check('a ?ref= is remembered', !!stored && JSON.parse(stored).code==='enrique', stored)
 
+// The path form of the link: onyx-tech.ai/zacrule (served from zacrule/index.html or 404.html).
+const pathPage = await (await b.newContext()).newPage()
+await pathPage.goto('http://localhost:4599/zacrule/')
+const fromPath = await pathPage.evaluate(()=>{const v=localStorage.getItem('onyx_ref');return v?JSON.parse(v).code:null})
+check('a /<code> path is remembered as the ref', fromPath==='zacrule', fromPath)
+await pathPage.goto('http://localhost:4599/zacrule')
+check('and without the trailing slash too', await pathPage.evaluate(()=>JSON.parse(localStorage.getItem('onyx_ref')).code)==='zacrule')
+check('the plain root page does not invent a ref', await (await (await b.newContext()).newPage()).goto('http://localhost:4599/').then(async (r)=>{const pg=r.request().frame().page();return await pg.evaluate(()=>localStorage.getItem('onyx_ref'))})===null)
+
 // Come back later with NO ref - the whole reason to persist it.
 await p.goto('http://localhost:4599/')
 const after = await p.evaluate(()=>localStorage.getItem('onyx_ref'))
@@ -57,7 +66,8 @@ await p.waitForTimeout(1500)
 const posted = await p.evaluate(()=>window.__lastPost||null)
 console.log('  (posted body captured by route:', globalThis.__posted ? 'yes' : 'no', ')')
 const body = globalThis.__posted ? JSON.parse(globalThis.__posted) : null
-check('the signup POST carries the ref', body && body.ref==='enrique', body)
+// The sheet gets the READABLE form (REF_NAMES); Onyx gets the raw code in its own POST.
+check('the signup POST carries the ref, as the partner\'s display name', body && body.ref==='Enrique', body)
 check('and still carries name/email/phone/business', body && body.name && body.email && body.phone && body.business, body)
 // The campaign belongs to the FIRST touch, so it has to be tested on a visitor
 // whose first touch carried one. Asserting it on the page above was wrong: that
