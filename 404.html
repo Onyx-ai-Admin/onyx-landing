@@ -1055,6 +1055,95 @@ footer .fcol a:hover{opacity:1}
   </div>
 </section>
 
+<style>
+/* ── Meet the founders, 2026-09-25 ────────────────────────────────────────────
+   Three portrait cards, in the page's own lifted-card language (.card sits on the
+   same --card/--line/--shadow-lg tokens as Use Cases and the comparison). Sits
+   after the job timeline: the reader has just watched the product work, so this
+   answers "who built this?" exactly where it gets asked.
+
+   PHOTOS: each card takes an <img> when one exists; until then it draws the
+   founder's initials in the brand blue, the same device as the hero's waitlist
+   avatars. Swapping a photo in is one line per card - see the comment there. */
+.founder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.1rem;max-width:960px;margin:0 auto}
+@media(max-width:820px){.founder-grid{grid-template-columns:1fr;max-width:420px}}
+.founder-card{background:var(--card);border-radius:18px;padding:1.5rem 1.4rem;box-shadow:var(--shadow-lg);text-align:center;display:flex;flex-direction:column;align-items:center}
+.founder-photo{width:96px;height:96px;border-radius:50%;object-fit:cover;display:block;background:var(--subtle);box-shadow:0 10px 24px -10px rgba(20,22,27,.35)}
+/* Initials stand-in: brand blue, white type, same circle as a real photo would fill. */
+.founder-initials{display:grid;place-items:center;width:96px;height:96px;border-radius:50%;background:var(--accent);color:#fff;font-family:var(--display);font-weight:700;font-size:2rem;letter-spacing:-.02em;box-shadow:0 10px 24px -8px rgba(30,123,255,.5)}
+.founder-card h3{font-size:1.08rem;font-weight:650;letter-spacing:-.01em;margin:1rem 0 0}
+.founder-role{font-family:var(--mono);font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:.35rem 0 0}
+.founder-card p.founder-bio{margin:.7rem 0 0;font-size:.92rem;line-height:1.6;color:var(--muted)}
+.founder-stats{max-width:760px;margin:clamp(1.75rem,4vw,2.25rem) auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;text-align:center}
+.founder-stats>div{padding:0 .4rem}
+.founder-stats>div+div{border-left:1px solid var(--line)}
+.founder-stat-num{font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,3.4vw,2.1rem);letter-spacing:-.03em;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
+.founder-stat-label{margin:.5rem 0 0;font-size:.82rem;line-height:1.45;color:var(--muted)}
+.founder-stats-lead{margin:clamp(1.75rem,4vw,2.25rem) auto 0;text-align:center;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+@media(max-width:520px){
+  .founder-stats{gap:.6rem}
+  .founder-stat-label{font-size:.72rem}
+  .founder-stats>div{padding:0 .2rem}
+}
+.founder-note{margin:clamp(1.25rem,3vw,1.75rem) auto 0;max-width:48ch;text-align:center;font-size:.95rem;line-height:1.65;color:var(--muted)}
+.founder-note b{color:var(--text);font-weight:600}
+</style>
+
+<section class="below" id="founders">
+  <div class="wrap">
+    <div class="below-head reveal">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span class="eyebrow-label">WHO BUILT IT</span><span class="eyebrow-line"></span></div>
+      <h2>Meet the founders.</h2>
+      <p>Not a software team guessing at this trade. The people who lay the floors, quote the work and run the leads.</p>
+    </div>
+
+    <div class="founder-grid">
+      <div class="founder-card card-reveal">
+        <img class="founder-photo" src="/assets/founders/sam.jpg" alt="Sam, co-founder of Onyx" width="96" height="96" loading="lazy" decoding="async">
+        <h3>Sam</h3>
+        <p class="founder-role">CO-FOUNDER &middot; ONYX</p>
+        <p class="founder-bio">Runs Essence Epoxy from the first missed call to the final payment: on the tools, on the phone, quoting the jobs and carrying the back end nobody sees. Onyx is the system he built to stop losing work to admin.</p>
+      </div>
+
+      <div class="founder-card card-reveal">
+        <img class="founder-photo" src="/assets/founders/sehaj.jpg" alt="Sehaj, co-founder of Onyx" width="96" height="96" loading="lazy" decoding="async">
+        <h3>Sehaj</h3>
+        <p class="founder-role">CO-FOUNDER &middot; ONYX</p>
+        <p class="founder-bio">Ran the marketing agency behind Essence Epoxy and heard the same complaint from every coatings contractor he took on: the software was built for someone else&rsquo;s trade. He builds the funnels, follow-ups and automations Onyx runs on.</p>
+      </div>
+
+      <div class="founder-card card-reveal">
+        <img class="founder-photo" src="/assets/founders/alex.jpg" alt="Alex, co-founder of Onyx" width="96" height="96" loading="lazy" decoding="async">
+        <h3>Alex</h3>
+        <p class="founder-role">CO-FOUNDER &middot; ONYX</p>
+        <p class="founder-bio">Lays the floors, prices the work and closes the jobs alongside Sam. Every feature in Onyx gets used on a real site by the people who built it before a single contractor sees it.</p>
+      </div>
+    </div>
+
+    <p class="founder-stats-lead reveal">What we have run through it ourselves, in our first 18 months</p>
+    <div class="founder-stats reveal">
+      <div>
+        <div class="founder-stat-num">$3.5M</div>
+        <p class="founder-stat-label">quoted through Onyx</p>
+      </div>
+      <div>
+        <div class="founder-stat-num">300+</div>
+        <p class="founder-stat-label">jobs run on it</p>
+      </div>
+      <div>
+        <div class="founder-stat-num">75-85%</div>
+        <p class="founder-stat-label">close rate on those quotes</p>
+      </div>
+    </div>
+
+    <p class="founder-note reveal">
+      Two installers who run a coatings business, and the marketer who ran their leads. We put the
+      floor work, the sales and the systems in one room and built the tool none of us could buy.
+      <b>Onyx is what we use to run our own jobs.</b>
+    </p>
+  </div>
+</section>
+
 <section class="below" id="ai">
   <div class="wrap">
     <div class="below-head reveal">
@@ -1675,14 +1764,20 @@ body.route-thanks .nav-cta{visibility:hidden}
   #compare .cmp-table tbody td .cmp-mark{max-width:60%;text-align:left}
   #compare th.cmp-onyx::before,#compare th.cmp-onyx::after{display:none}
 }
-}
 
 /* ── Founding price: the tools tally up, the total is struck, they collapse into one Onyx chip ── */
-.tally{position:relative;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.4rem;max-width:560px;min-height:4.4rem;margin:0 auto clamp(1.5rem,4vw,2rem)}
-.tally-chip{font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:#178A43;border:1px solid #178A43;font-weight:600;border-radius:999px;padding:.3rem .65rem;opacity:0}
+.tally{position:relative;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.4rem;width:100%;max-width:560px;min-height:4.4rem;margin:0 auto clamp(1.5rem,4vw,2rem)}
+.tally-chip{white-space:nowrap;font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:#178A43;border:1px solid #178A43;font-weight:600;border-radius:999px;padding:.3rem .65rem;opacity:0}
 .tally-onyx{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.6);opacity:0;white-space:nowrap;font-weight:600;font-size:.9rem;color:#fff;background:var(--accent);border-radius:999px;padding:.55rem 1.1rem;box-shadow:0 8px 20px -6px rgba(30,123,255,.45)}
 #founding-price.is-on .tally-chip{animation:chipLife 3.4s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--i)*80ms)}
 #founding-price.is-on .tally-onyx{animation:onyxIn .65s cubic-bezier(.175,.885,.32,1.275) 3.3s both}
+/* Phone: 11 pills in ~300px of card. Tighter type and padding keeps them to four
+   calm rows instead of breaking words inside the pills and running to the edges. */
+@media(max-width:560px){
+  .tally{gap:.3rem;padding-inline:.2rem;min-height:0}
+  .tally-chip{font-size:.56rem;letter-spacing:.04em;padding:.28rem .5rem}
+  .tally-onyx{font-size:.82rem;padding:.5rem .95rem}
+}
 @keyframes chipLife{0%{opacity:0;transform:scale(.7)}14%{opacity:1;transform:none}72%{opacity:1;transform:none}100%{opacity:0;transform:scale(.3)}}
 /* after it lands, the Onyx chip is clickable: it opens the tools back up so they can be read,
    and they stay open (no replay on scroll). Not clickable mid-animation - .ready is added on animationend. */
