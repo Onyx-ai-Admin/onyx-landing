@@ -689,14 +689,27 @@ footer .fcol a:hover{opacity:1}
    .gradient-bg glow), which cut a hard rectangular seam into what is otherwise one
    continuous atmosphere. Sections are now differentiated by spacing alone. */
 
-/* Product: two click-to-play video cards */
-.vid-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:960px;margin:0 auto}
-@media(max-width:760px){.vid-grid{grid-template-columns:1fr}}
+/* Product: one click-to-play video card.
+   Was a 1fr 1fr pair (a product tour and a setup walkthrough) until 2026-09-27, when
+   both were replaced by a single launch film that covers the same ground end to end.
+   One column at every width: a lone card in a two-column grid sits at half width with
+   a hole beside it, and a 16:9 frame at the full 960px wrap is the point of a film. */
+.vid-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;max-width:960px;margin:0 auto}
 .vid-card{background:var(--card);border-radius:18px;overflow:hidden;box-shadow:var(--shadow-lg)}
 .vid-frame{position:relative;aspect-ratio:16/9;background:#000;cursor:pointer}
 .vid-frame img{width:100%;height:100%;object-fit:cover;display:block;opacity:.88;transition:opacity .2s ease}
 .vid-frame:hover img{opacity:1}
-.vid-frame video{width:100%;height:100%;object-fit:cover;display:block}
+/* contain, never cover. Inline the frame is 16:9 and so is the film, so the two agree -
+   but in FULLSCREEN the video element is sized to the whole screen, and on a phone that
+   box is portrait. cover then scales a 1920x1080 frame to fill 390x844, showing about a
+   quarter of its width, centre-cropped: the film's text is on the left and its UI on the
+   right, so all a viewer got was a zoomed slice of the middle. Letterbox on black. */
+.vid-frame video{width:100%;height:100%;object-fit:contain;display:block;background:#000}
+.vid-frame video:fullscreen,.vid-frame video:-webkit-full-screen{object-fit:contain;background:#000}
+/* Shown only if the browser grants playback but force-mutes it (see the script below).
+   A film carrying a voiceover that plays silently is worse than one that doesn't play. */
+.vid-unmute{position:absolute;left:50%;bottom:4.25rem;transform:translateX(-50%);display:flex;align-items:center;gap:.4rem;padding:.55rem .9rem;border:0;border-radius:999px;background:rgba(20,22,27,.88);color:#fff;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.35);z-index:2}
+.vid-unmute svg{width:15px;height:15px;fill:currentColor}
 .vid-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
 .vid-play span{width:56px;height:56px;border-radius:999px;background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.28);transition:transform .15s ease}
 .vid-frame:hover .vid-play span{transform:scale(1.07)}
@@ -934,23 +947,13 @@ footer .fcol a:hover{opacity:1}
     </div>
     <div class="vid-grid">
       <div class="vid-card card-reveal">
-        <div class="vid-frame" data-video="/assets/video/what-is-onyx.mp4" role="button" tabindex="0" aria-label="Play: what Onyx does">
-          <img src="/assets/video/what-is-onyx-poster.jpg" alt="A conversation being handled automatically inside Onyx" loading="lazy">
+        <div class="vid-frame" data-video="/assets/video/onyx-launch-film-voiceover-sfx.mp4" role="button" tabindex="0" aria-label="Play: the Onyx launch film">
+          <img src="/assets/video/launch-film-poster.jpg" alt="The Onyx leads pipeline, with a new lead arriving from Google Ads" loading="lazy">
           <div class="vid-play"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></div>
         </div>
         <div class="vid-body">
-          <div class="vid-label">WHAT ONYX DOES</div>
-          <h3>A lead comes in, and Onyx takes it from there.</h3>
-        </div>
-      </div>
-      <div class="vid-card card-reveal">
-        <div class="vid-frame" data-video="/assets/video/onboarding.mp4" role="button" tabindex="0" aria-label="Play: getting started">
-          <img src="/assets/video/onboarding-poster.jpg" alt="Choosing a plan during Onyx setup" loading="lazy">
-          <div class="vid-play"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></div>
-        </div>
-        <div class="vid-body">
-          <div class="vid-label">GETTING STARTED</div>
-          <h3>Set up your business, and you're quoting the same sitting.</h3>
+          <div class="vid-label">THE FULL LOOP</div>
+          <h3>A lead comes in, and Onyx takes it all the way to paid.</h3>
         </div>
       </div>
     </div>
@@ -1991,9 +1994,9 @@ body.route-thanks .nav-cta{visibility:hidden}
 
 <script>
 (function(){
-  // Click-to-play facade for the two Product videos: nothing loads or plays until
-  // pressed, so the page never ships two live video players to a visitor who never
-  // presses play. Self-contained and independent of the main routing/reveal script
+  // Click-to-play facade for the Product video: nothing loads or plays until pressed,
+  // so the page never ships a live video player - nor the film's 9.7MB - to a visitor
+  // who never presses play. Self-contained and independent of the main routing/reveal script
   // above, on purpose - this has nothing to do with #join/#thanks routing.
   document.querySelectorAll('.vid-frame').forEach(function(frame){
     function play(){
@@ -2009,13 +2012,40 @@ body.route-thanks .nav-cta{visibility:hidden}
       // and the system volume - Chrome auto-mutes a tab the FIRST time it judges an
       // autoplay attempt unearned, and that mute is sticky per-tab until toggled.
       video.src = src; video.controls = true; video.playsInline = true;
+      // Say it outright rather than trusting the default. An element built by script
+      // starts unmuted, but being explicit costs nothing and documents the intent: this
+      // film carries a voiceover, and playing it silently defeats the point.
+      video.muted = false; video.volume = 1;
       frame.innerHTML = '';
       frame.appendChild(video);
       frame.removeAttribute('role'); frame.removeAttribute('tabindex');
-      video.play().catch(function(){ /* user can still press the native play control */ });
+      // Stop listening once the player is in. The native controls sit INSIDE the frame,
+      // so without this every press of pause, the scrubber, volume or fullscreen bubbles
+      // up here and runs play() again - which rebuilds the element and throws the viewer
+      // back to 0:00. Worst on a phone, where the controls are most of the tap area.
+      frame.removeEventListener('click', play);
+      frame.removeEventListener('keydown', onKey);
+      video.play().then(function(){
+        // A browser may grant playback and STILL force-mute it - Chrome does this when it
+        // has decided the tab hasn't earned audio, and the mute is sticky per tab. That
+        // leaves a voiceover film running in silence with nothing on screen to explain
+        // why, so offer the one control that fixes it.
+        if (video.muted) {
+          var btn = document.createElement('button');
+          btn.type = 'button'; btn.className = 'vid-unmute';
+          btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1c2.9.9 5 3.6 5 6.7s-2.1 5.8-5 6.7v2.1c4-.9 7-4.5 7-8.8s-3-7.9-7-8.8z"/></svg>Tap for sound';
+          btn.addEventListener('click', function(e){
+            e.stopPropagation();           // the frame itself is not a play target any more
+            video.muted = false; video.volume = 1;
+            btn.remove();
+          });
+          frame.appendChild(btn);
+        }
+      }).catch(function(){ /* user can still press the native play control */ });
     }
+    function onKey(e){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); play(); } }
     frame.addEventListener('click', play);
-    frame.addEventListener('keydown', function(e){ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); play(); } });
+    frame.addEventListener('keydown', onKey);
   });
 })();
 </script>
