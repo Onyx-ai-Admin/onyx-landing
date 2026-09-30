@@ -2162,6 +2162,12 @@ body.route-thanks .nav-cta{visibility:hidden}
     }catch(e){ return null; }
   }
 
+  // Short links and old links, folded into the one code the partner is known by on the
+  // Onyx side (Sehaj, 2026-09-30: Zac's link is onyx-tech.ai/z, "just a Z"). The folder
+  // for each alias is written by make-links.mjs; the code that is stored and sent is the
+  // canonical one, so nothing downstream has to know the alias exists.
+  var REF_ALIASES = { z: 'zacrule', zac: 'zacrule' };
+
   function captureRef(){
     var params=new URLSearchParams(location.search);
     // `ref` is ours; `via` and `utm_source` are what partners paste out of habit. A
@@ -2173,6 +2179,7 @@ body.route-thanks .nav-cta{visibility:hidden}
     // Codes are ours to issue, so anything unexpected is a typo or someone poking
     // at it - trimmed hard rather than trusted into a spreadsheet cell.
     code=code.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,40);
+    code=REF_ALIASES[code]||code;
     if(!code) return;
     if(readRef()) return;                    // first touch wins
     try{ localStorage.setItem(REF_KEY, JSON.stringify({

@@ -27,6 +27,15 @@ const fromPath = await pathPage.evaluate(()=>{const v=localStorage.getItem('onyx
 check('a /<code> path is remembered as the ref', fromPath==='zacrule', fromPath)
 await pathPage.goto('http://localhost:4599/zacrule')
 check('and without the trailing slash too', await pathPage.evaluate(()=>JSON.parse(localStorage.getItem('onyx_ref')).code)==='zacrule')
+// Zac's short link (Sehaj, 2026-09-30): onyx-tech.ai/z stores the canonical code, as does the old /zac.
+for (const alias of ['z', 'zac']) {
+  const aliasPage = await (await b.newContext()).newPage()
+  await aliasPage.goto(`http://localhost:4599/${alias}/`)
+  check(`/${alias} is remembered as zacrule`, await aliasPage.evaluate(()=>{const v=localStorage.getItem('onyx_ref');return v?JSON.parse(v).code:null})==='zacrule')
+}
+const qAlias = await (await b.newContext()).newPage()
+await qAlias.goto('http://localhost:4599/?ref=z')
+check('?ref=z is remembered as zacrule too', await qAlias.evaluate(()=>JSON.parse(localStorage.getItem('onyx_ref')).code)==='zacrule')
 check('the plain root page does not invent a ref', await (await (await b.newContext()).newPage()).goto('http://localhost:4599/').then(async (r)=>{const pg=r.request().frame().page();return await pg.evaluate(()=>localStorage.getItem('onyx_ref'))})===null)
 
 // Come back later with NO ref - the whole reason to persist it.

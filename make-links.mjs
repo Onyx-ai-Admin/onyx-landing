@@ -3,7 +3,8 @@
 // without a folder still lands on the page (the script reads the code from the path).
 // Run after ANY edit to index.html:  node make-links.mjs
 import { readFileSync, writeFileSync, mkdirSync } from 'fs'
-const CODES = ['enrique', 'zacrule']
+// 'z' and 'zac' are Zac Rule's short and old links; index.html folds them into 'zacrule'.
+const CODES = ['enrique', 'zacrule', 'z', 'zac']
 const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8')
 // The copies are served one folder down (and 404.html from anywhere), so every relative
 // URL in the page has to become root-relative or the images and the About link 404.
