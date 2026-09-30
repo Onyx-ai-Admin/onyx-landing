@@ -2197,7 +2197,8 @@ body.route-thanks .nav-cta{visibility:hidden}
   // are all one partner - matching must never depend on how someone typed a link.
   // What lands in the sheet is the readable form, because a column of lowercase
   // first names is something Sehaj would end up fixing by hand every week.
-  var REF_NAMES = { enrique: 'Enrique', zacrule: 'Zac Rule' };
+  // alex / sam / sehaj are the partners themselves (2026-09-30): attribution in the sheet only.
+  var REF_NAMES = { enrique: 'Enrique', zacrule: 'Zac Rule', alex: 'Alex', sam: 'Sam', sehaj: 'Sehaj' };
 
   function refDisplayName(code){
     if(REF_NAMES[code]) return REF_NAMES[code];

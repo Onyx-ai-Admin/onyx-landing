@@ -33,6 +33,12 @@ for (const alias of ['z', 'zac']) {
   await aliasPage.goto(`http://localhost:4599/${alias}/`)
   check(`/${alias} is remembered as zacrule`, await aliasPage.evaluate(()=>{const v=localStorage.getItem('onyx_ref');return v?JSON.parse(v).code:null})==='zacrule')
 }
+// The three partners' own links (2026-09-30): stored as themselves, no folding.
+for (const who of ['alex', 'sam', 'sehaj']) {
+  const pg = await (await b.newContext()).newPage()
+  await pg.goto(`http://localhost:4599/${who}/`)
+  check(`/${who} is remembered as ${who}`, await pg.evaluate(()=>{const v=localStorage.getItem('onyx_ref');return v?JSON.parse(v).code:null})===who)
+}
 const qAlias = await (await b.newContext()).newPage()
 await qAlias.goto('http://localhost:4599/?ref=z')
 check('?ref=z is remembered as zacrule too', await qAlias.evaluate(()=>JSON.parse(localStorage.getItem('onyx_ref')).code)==='zacrule')
