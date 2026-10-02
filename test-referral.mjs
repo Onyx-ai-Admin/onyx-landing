@@ -39,6 +39,10 @@ for (const who of ['alex', 'sam', 'sehaj']) {
   await pg.goto(`http://localhost:4599/${who}/`)
   check(`/${who} is remembered as ${who}`, await pg.evaluate(()=>{const v=localStorage.getItem('onyx_ref');return v?JSON.parse(v).code:null})===who)
 }
+// JP Resin (2026-10-02): the link as typed, onyx-tech.ai/JP, stores the lowercase code jp.
+const jpPage = await (await b.newContext()).newPage()
+await jpPage.goto('http://localhost:4599/JP/')
+check('/JP is remembered as jp', await jpPage.evaluate(()=>{const v=localStorage.getItem('onyx_ref');return v?JSON.parse(v).code:null})==='jp')
 const qAlias = await (await b.newContext()).newPage()
 await qAlias.goto('http://localhost:4599/?ref=z')
 check('?ref=z is remembered as zacrule too', await qAlias.evaluate(()=>JSON.parse(localStorage.getItem('onyx_ref')).code)==='zacrule')

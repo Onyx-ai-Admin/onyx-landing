@@ -6,7 +6,8 @@ import { readFileSync, writeFileSync, mkdirSync } from 'fs'
 // 'z' and 'zac' are Zac Rule's short and old links; index.html folds them into 'zacrule'.
 // alex, sam, sehaj are the three partners' own links (Sehaj, 2026-09-30): not affiliates, no
 // commission, just so the sales sheet says who brought a signup in.
-const CODES = ['enrique', 'zacrule', 'z', 'zac', 'alex', 'sam', 'sehaj']
+// jp = JP Resin (affiliate, 2026-10-02); the capital JP folder covers the link as he will type it.
+const CODES = ['enrique', 'zacrule', 'z', 'zac', 'alex', 'sam', 'sehaj', 'jp', 'JP']
 const html = readFileSync(new URL('./index.html', import.meta.url), 'utf8')
 // The copies are served one folder down (and 404.html from anywhere), so every relative
 // URL in the page has to become root-relative or the images and the About link 404.
