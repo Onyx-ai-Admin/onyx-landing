@@ -8,7 +8,9 @@
  *
  * Headers it knows (case and punctuation do not matter):
  *   Name, Phone, Email, Business Name, Location, Date, Attribution, Campaign Name,
- *   Ad-Set Name, Ad Name, Notes. Column A with a blank header gets the running number.
+ *   Ad-Set Name, Ad Name, Status, Plan, Notes. Column A with a blank header gets the running
+ *   number. Status and Plan are hand-kept (Sehaj, 2026-10-17); a new signup starts as
+ *   Status "Waitlist" and Plan "N/a" so it reads like the rows around it.
  *
  * DEPLOYING: Deploy > Manage deployments > the pencil on the existing deployment > Version:
  * New version > Deploy. That keeps the /exec URL the page already has. A brand-new
@@ -28,8 +30,11 @@ var FIELD_HEADERS = {
   campaign: ['campaign name', 'campaign'],
   adset:    ['ad-set name', 'ad set name', 'adset name', 'adset', 'ad set'],
   ad:       ['ad name', 'ad'],
+  status:   ['status'],
+  plan:     ['plan'],
   notes:    ['notes']
 };
+var DEFAULTS = { status: 'Waitlist', plan: 'N/a' };
 
 function norm_(h) { return String(h || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
 
@@ -56,6 +61,7 @@ function buildRow(headerRow, payload, nextIndex, dateText) {
   for (field in map) {
     if (field === 'date') { row[map.date] = dateText; continue; }
     var v = payload[field];
+    if ((v === undefined || v === null || v === '') && DEFAULTS[field] !== undefined) v = DEFAULTS[field];
     if (v === undefined || v === null) continue;
     row[map[field]] = String(v).slice(0, 200);
   }
