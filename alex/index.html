@@ -2169,6 +2169,8 @@ body.route-thanks .nav-cta{visibility:hidden}
   // People (partners and the team) and channels. A channel reads as its own name in the sheet
   // and never takes credit from a person (see captureRef). Declared here, above captureRef(),
   // because the capture runs the moment the page loads.
+  // The sheet's Location column, from the flag beside the phone number.
+  var LOCATION_BY_FLAG = { '\uD83C\uDDE6\uD83C\uDDFA': 'Australia', '\uD83C\uDDF3\uD83C\uDDFF': 'New Zealand', '\uD83C\uDDFA\uD83C\uDDF8': 'United States', '\uD83C\uDDE8\uD83C\uDDE6': 'Canada' };
   var CHANNEL_CODES = { ig: 1, instagram: 1, fb: 1, facebook: 1, 'meta-ads': 1, meta: 1, google: 1, 'google-ads': 1, tiktok: 1, youtube: 1, linkedin: 1 };
   var REF_NAMES = { enrique: 'Enrique', zacrule: 'Zac Rule', alex: 'Alex', sam: 'Sam', sehaj: 'Sehaj', jp: 'JP Resin', teg: 'The Epoxy Group',
     ig: 'Instagram', instagram: 'Instagram', fb: 'Facebook', facebook: 'Facebook', 'meta-ads': 'Meta Ads', meta: 'Meta Ads', google: 'Google', 'google-ads': 'Google Ads', tiktok: 'TikTok', youtube: 'YouTube', linkedin: 'LinkedIn' };
@@ -2180,7 +2182,9 @@ body.route-thanks .nav-cta{visibility:hidden}
     // /?ref=zac"), so the first path segment is a code too - this page is served at
     // /<code>/ from a copy made by make-links.mjs, and by 404.html for any other code.
     var seg=(location.pathname.split('/').filter(Boolean)[0]||'').replace(/\.html$/,'');
-    var code=params.get('ref')||params.get('via')||params.get('utm_source')||seg||'';
+    // The path code outranks utm_source: an Instagram share appends utm_source=ig to a partner's
+    // /enrique link, and the partner, not the channel, sent them (2026-10-17).
+    var code=params.get('ref')||params.get('via')||seg||params.get('utm_source')||'';
     // Codes are ours to issue, so anything unexpected is a typo or someone poking
     // at it - trimmed hard rather than trusted into a spreadsheet cell.
     code=code.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,40);
@@ -2199,8 +2203,12 @@ body.route-thanks .nav-cta{visibility:hidden}
     try{ localStorage.setItem(REF_KEY, JSON.stringify({
       code: code,
       at: Date.now(),
-      campaign: (params.get('utm_campaign')||'').trim().slice(0,60),
-      medium: (params.get('utm_medium')||'').trim().slice(0,40)
+      campaign: (params.get('utm_campaign')||params.get('campaign')||'').trim().slice(0,80),
+      medium: (params.get('utm_medium')||'').trim().slice(0,40),
+      // Meta fills these from the ad itself when the tracking string carries
+      // {{adset.name}} and {{ad.name}} (Sehaj, 2026-10-17: the sheet has a column for each).
+      adset: (params.get('utm_term')||params.get('adset')||'').trim().slice(0,80),
+      ad: (params.get('utm_content')||params.get('ad')||'').trim().slice(0,80)
     })); }catch(e){}
   }
   captureRef();
@@ -2343,10 +2351,16 @@ body.route-thanks .nav-cta{visibility:hidden}
       // updated yet simply ignores them and the signup still lands - the form
       // must never break because attribution changed.
       var ref=readRef();
+      // Every signup carries when and where (Sehaj, 2026-10-17: Date and Location columns).
+      payload.date=new Date().toISOString();
+      var flagOpt=country.options[country.selectedIndex];
+      payload.location=LOCATION_BY_FLAG[flagOpt ? flagOpt.getAttribute('data-flag') : '']||'';
       if(ref){
         payload.ref=refDisplayName(ref.code);
         if(ref.campaign) payload.campaign=ref.campaign;
         if(ref.medium) payload.medium=ref.medium;
+        if(ref.adset) payload.adset=ref.adset;
+        if(ref.ad) payload.ad=ref.ad;
         payload.refAt=new Date(ref.at).toISOString();
       }
 
