@@ -2166,6 +2166,13 @@ body.route-thanks .nav-cta{visibility:hidden}
   // canonical one, so nothing downstream has to know the alias exists.
   var REF_ALIASES = { z: 'zacrule', zac: 'zacrule' };
 
+  // People (partners and the team) and channels. A channel reads as its own name in the sheet
+  // and never takes credit from a person (see captureRef). Declared here, above captureRef(),
+  // because the capture runs the moment the page loads.
+  var CHANNEL_CODES = { ig: 1, instagram: 1, fb: 1, facebook: 1, 'meta-ads': 1, meta: 1, google: 1, 'google-ads': 1, tiktok: 1, youtube: 1, linkedin: 1 };
+  var REF_NAMES = { enrique: 'Enrique', zacrule: 'Zac Rule', alex: 'Alex', sam: 'Sam', sehaj: 'Sehaj', jp: 'JP Resin', teg: 'The Epoxy Group',
+    ig: 'Instagram', instagram: 'Instagram', fb: 'Facebook', facebook: 'Facebook', 'meta-ads': 'Meta Ads', meta: 'Meta Ads', google: 'Google', 'google-ads': 'Google Ads', tiktok: 'TikTok', youtube: 'YouTube', linkedin: 'LinkedIn' };
+
   function captureRef(){
     var params=new URLSearchParams(location.search);
     // `ref` is ours; `via` and `utm_source` are what partners paste out of habit. A
@@ -2179,7 +2186,16 @@ body.route-thanks .nav-cta{visibility:hidden}
     code=code.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,40);
     code=REF_ALIASES[code]||code;
     if(!code) return;
-    if(readRef()) return;                    // first touch wins
+    // First touch wins between people. A CHANNEL code (the Instagram bio link's ig, the ads'
+    // meta-ads, fb, google) never outranks a person: Sam's own link opened in a browser that
+    // had once followed the bio link was writing "Ig" to the sheet (Sehaj, 2026-10-17). So a
+    // named partner or teammate replaces a stored channel; a channel never replaces anyone.
+    var stored=readRef();
+    if(stored){
+      var storedIsPerson=!!REF_NAMES[stored.code] && !CHANNEL_CODES[stored.code];
+      var newIsPerson=!!REF_NAMES[code] && !CHANNEL_CODES[code];
+      if(storedIsPerson || !newIsPerson) return;
+    }
     try{ localStorage.setItem(REF_KEY, JSON.stringify({
       code: code,
       at: Date.now(),
@@ -2196,7 +2212,6 @@ body.route-thanks .nav-cta{visibility:hidden}
   // What lands in the sheet is the readable form, because a column of lowercase
   // first names is something Sehaj would end up fixing by hand every week.
   // alex / sam / sehaj are the partners themselves (2026-09-30): attribution in the sheet only.
-  var REF_NAMES = { enrique: 'Enrique', zacrule: 'Zac Rule', alex: 'Alex', sam: 'Sam', sehaj: 'Sehaj', jp: 'JP Resin', teg: 'The Epoxy Group' };
 
   function refDisplayName(code){
     if(REF_NAMES[code]) return REF_NAMES[code];
