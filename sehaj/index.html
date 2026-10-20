@@ -587,7 +587,7 @@ footer .fcol a:hover{opacity:1}
           </div>
         </div>
         <div class="wl-proof reveal">
-          <span class="wl-text">Join <b data-wl-count>37</b> others on the waitlist.</span>
+          <span class="wl-text">Join <b data-wl-count>0</b> others on the waitlist.</span>
         </div>
         <a class="btn btn-primary hero-join reveal" href="#join">Join now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a>
         <p class="offer-line reveal">Founding members lock in <b class="pop">50% OFF FOR LIFE.</b> <span class="offer-sub">No credit card to join.</span></p>
@@ -2136,7 +2136,7 @@ body.route-thanks .nav-cta{visibility:hidden}
   // cut at, so editing Apps Script does nothing until a NEW VERSION of THIS
   // deployment is published. Verified 2026-09-02 by posting to both.
   var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwgQGqmlgWKAfAOpV0NFifGjs64wF0F7W4XVUyWarqC93PWPIbX6QVgu7yvdblnrboY/exec';
-  var WL_BASE=37, WL_KEY='onyx_wl_count';
+  var WL_BASE=75, WL_KEY='onyx_wl_count';
 
   // ── Referral attribution ───────────────────────────────────────────────────
   // An affiliate sends someone here as ?ref=their-code. The code is REMEMBERED
@@ -2232,45 +2232,57 @@ body.route-thanks .nav-cta{visibility:hidden}
   }
   var liveMode = WEBAPP_URL.indexOf('http')===0;
 
-  function wlCached(){var v=parseInt(localStorage.getItem(WL_KEY),10);return (isNaN(v)||v<WL_BASE)?WL_BASE:v;}
+  function wlCached(){var v=NaN;try{v=parseInt(localStorage.getItem(WL_KEY),10)}catch(e){}return (isNaN(v)||v<WL_BASE)?WL_BASE:v;}
   function wlStore(n){try{localStorage.setItem(WL_KEY,n)}catch(e){}}
-  // rolls the displayed count up from whatever it currently shows to n (0 on
-  // first paint, since the element starts empty) rather than snapping - each
-  // call gets its own token so a fast update (e.g. the 20s poll) cancels any
-  // still-running animation on that element instead of the two fighting.
-  var wlTarget=null;
-  function wlShow(n){
-    n=Number(n); wlTarget=n;
-    document.querySelectorAll('[data-wl-count]').forEach(function(e){
-      var from=parseInt((e.textContent||'').replace(/,/g,''),10);
-      if(isNaN(from))from=0;
-      if(reduce||from===n){ e.textContent=n.toLocaleString(); return; }
-      var id=(e._wlAnimId=(e._wlAnimId||0)+1);
-      var start=performance.now(), dur=2200;
-      requestAnimationFrame(function tick(now){
-        if(e._wlAnimId!==id) return;
-        var t=Math.min(1,Math.max(0,(now-start)/dur));
-        var eased=1-Math.pow(1-t,3);
-        var lo=Math.min(from,n), hi=Math.max(from,n);
-        var val=Math.min(hi,Math.max(lo,Math.round(from+(n-from)*eased)));
-        e.textContent=val.toLocaleString();
-        if(t<1) requestAnimationFrame(tick);
-      });
-    });
+
+  // ONE continuous roll from 0, never a stop-start (Sehaj, 2026-10-21: "stalls at 30 something
+  // then continues"). The live count needs ~3s (the Apps Script /exec 302s before it answers),
+  // and the old roll ran to the cached guess in 2.2s, sat there, then started a second roll.
+  // Now there are two phases on one clock:
+  //  - waiting: the number climbs toward the guess on an exponential curve that slows but never
+  //    arrives, so it is always still moving when the live count lands;
+  //  - final: from wherever it is, at whatever speed it is going, a Hermite glide to the real
+  //    number that starts at the current speed and ends at rest. No jump in speed, no overshoot.
+  // Later changes (the 20s poll, the visitor's own signup) glide from rest the same way.
+  var wlTarget=null, wlVal=0, wlVel=0, wlPhase='waiting', wlT0=performance.now(), wlSeg=null, wlRaf=0;
+  var WL_TAU=1.4;   // seconds; at 3s the waiting curve is at 88% of the guess and still climbing
+  function wlPaint(v){
+    var t=Math.max(0,Math.round(v)).toLocaleString();
+    document.querySelectorAll('[data-wl-count]').forEach(function(e){ if(e.textContent!==t) e.textContent=t; });
   }
-  // Every visit rolls up from 0, returning visitors included (2026-09-23): the
-  // roll IS the effect, and painting a cached number straight away meant anyone
-  // who had been here before never saw it. The roll starts immediately against
-  // the cached number so it never waits on the network; if the live count that
-  // arrives differs, wlShow just re-targets the same animation. This used to
-  // animate to the hardcoded fallback on its own fixed 2.2s timer and only THEN
-  // fetch the live count - but the Apps Script endpoint 302s to its real execution
-  // URL before it responds (~3s round trip, measured), so the fallback animation
-  // routinely finished and sat still for a second or more before jumping to the
-  // real number. Outside live mode (preview/offline) no fetch is ever coming, so
-  // that path keeps its own animated fallback.
-  document.querySelectorAll('[data-wl-count]').forEach(function(e){ e.textContent='0'; });
-  wlShow(wlCached());
+  function wlFrame(now){
+    wlRaf=0;
+    var guess=wlCached();
+    if(wlPhase==='waiting'){
+      var t=(now-wlT0)/1000, k=Math.exp(-t/WL_TAU);
+      wlVal=guess*(1-k); wlVel=guess*k/WL_TAU;
+    } else if(wlSeg){
+      var s=Math.min(1,(now-wlSeg.t0)/(wlSeg.d*1000)), s2=s*s, s3=s2*s;
+      var a=wlSeg.p0, b=wlSeg.p1, m=wlSeg.v0*wlSeg.d;
+      wlVal=(2*s3-3*s2+1)*a+(s3-2*s2+s)*m+(-2*s3+3*s2)*b;
+      wlVel=((6*s2-6*s)*a+(3*s2-4*s+1)*m+(-6*s2+6*s)*b)/wlSeg.d;
+      if(s>=1){ wlVal=b; wlVel=0; wlSeg=null; }
+    }
+    wlPaint(wlVal);
+    if(wlPhase==='waiting' || wlSeg) wlRaf=requestAnimationFrame(wlFrame);
+  }
+  function wlKick(){ if(!wlRaf) wlRaf=requestAnimationFrame(wlFrame); }
+  function wlShow(n){
+    n=Number(n); if(isNaN(n)) return;
+    wlTarget=n;
+    if(reduce){ wlPhase='final'; wlSeg=null; wlVal=n; wlVel=0; wlPaint(n); return; }
+    var now=performance.now();
+    var from=wlVal, delta=n-from;
+    if(Math.abs(delta)<0.5 && wlPhase==='final'){ wlSeg=null; wlVal=n; wlPaint(n); return; }
+    // Longer glides for bigger gaps, so the speed stays in the same family as the roll.
+    var d=Math.min(2.2, Math.max(0.9, 0.9+Math.abs(delta)/60));
+    // Carry the current speed in, capped at 3x the average so the curve never overshoots.
+    var v0=delta>0 ? Math.min(Math.max(0,wlVel), 3*delta/d) : 0;
+    wlPhase='final'; wlSeg={ p0: from, p1: n, v0: v0, d: d, t0: now };
+    wlKick();
+  }
+  wlPaint(0);
+  if(reduce || !liveMode){ wlPhase='final'; wlShow(wlCached()); } else { wlKick(); }
 
   // #thanks badge: follows the same count the hero shows (it used to be a
   // hardcoded 18 that disagreed with the hero). Once this visitor signs up,
@@ -2289,10 +2301,8 @@ body.route-thanks .nav-cta{visibility:hidden}
   }
   refreshCount();
   if(liveMode) setInterval(refreshCount, 20000); // poll every 20s so it ticks up as others join
-  // Safety net for a slow/failed first fetch: 4s is comfortably past the normal
-  // ~3s round trip, so this is a no-op on a normal load and only rescues a
-  // visitor who'd otherwise stare at 0 with no backend response in sight.
-  if(liveMode) setTimeout(function(){ if(!wlGotLive && wlCached()!==wlTarget) wlShow(wlCached()); }, 4000);
+  // No answer by 6s: finish the roll on the remembered number rather than creeping forever.
+  if(liveMode) setTimeout(function(){ if(!wlGotLive && wlPhase==='waiting') wlShow(wlCached()); }, 6000);
 
   var form=document.getElementById('wlForm');
   if(form){
