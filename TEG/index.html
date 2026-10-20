@@ -587,7 +587,7 @@ footer .fcol a:hover{opacity:1}
           </div>
         </div>
         <div class="wl-proof reveal">
-          <span class="wl-text">Join <b data-wl-count>37</b> others on the waitlist.</span>
+          <span class="wl-text">Join <b data-wl-count>0</b> others on the waitlist.</span>
         </div>
         <a class="btn btn-primary hero-join reveal" href="#join">Join now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a>
         <p class="offer-line reveal">Founding members lock in <b class="pop">50% OFF FOR LIFE.</b> <span class="offer-sub">No credit card to join.</span></p>
@@ -2136,7 +2136,7 @@ body.route-thanks .nav-cta{visibility:hidden}
   // cut at, so editing Apps Script does nothing until a NEW VERSION of THIS
   // deployment is published. Verified 2026-09-02 by posting to both.
   var WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwgQGqmlgWKAfAOpV0NFifGjs64wF0F7W4XVUyWarqC93PWPIbX6QVgu7yvdblnrboY/exec';
-  var WL_BASE=37, WL_KEY='onyx_wl_count';
+  var WL_BASE=75, WL_KEY='onyx_wl_count';
 
   // ── Referral attribution ───────────────────────────────────────────────────
   // An affiliate sends someone here as ?ref=their-code. The code is REMEMBERED
@@ -2166,6 +2166,15 @@ body.route-thanks .nav-cta{visibility:hidden}
   // canonical one, so nothing downstream has to know the alias exists.
   var REF_ALIASES = { z: 'zacrule', zac: 'zacrule' };
 
+  // People (partners and the team) and channels. A channel reads as its own name in the sheet
+  // and never takes credit from a person (see captureRef). Declared here, above captureRef(),
+  // because the capture runs the moment the page loads.
+  // The sheet's Location column, from the flag beside the phone number.
+  var LOCATION_BY_FLAG = { '\uD83C\uDDE6\uD83C\uDDFA': 'Australia', '\uD83C\uDDF3\uD83C\uDDFF': 'New Zealand', '\uD83C\uDDFA\uD83C\uDDF8': 'United States', '\uD83C\uDDE8\uD83C\uDDE6': 'Canada' };
+  var CHANNEL_CODES = { ig: 1, instagram: 1, fb: 1, facebook: 1, 'meta-ads': 1, meta: 1, google: 1, 'google-ads': 1, tiktok: 1, youtube: 1, linkedin: 1 };
+  var REF_NAMES = { enrique: 'Enrique', zacrule: 'Zac Rule', alex: 'Alex', sam: 'Sam', sehaj: 'Sehaj', jp: 'JP Resin', teg: 'The Epoxy Group',
+    ig: 'Instagram', instagram: 'Instagram', fb: 'Facebook', facebook: 'Facebook', 'meta-ads': 'Meta Ads', meta: 'Meta Ads', google: 'Google', 'google-ads': 'Google Ads', tiktok: 'TikTok', youtube: 'YouTube', linkedin: 'LinkedIn' };
+
   function captureRef(){
     var params=new URLSearchParams(location.search);
     // `ref` is ours; `via` and `utm_source` are what partners paste out of habit. A
@@ -2173,18 +2182,33 @@ body.route-thanks .nav-cta{visibility:hidden}
     // /?ref=zac"), so the first path segment is a code too - this page is served at
     // /<code>/ from a copy made by make-links.mjs, and by 404.html for any other code.
     var seg=(location.pathname.split('/').filter(Boolean)[0]||'').replace(/\.html$/,'');
-    var code=params.get('ref')||params.get('via')||params.get('utm_source')||seg||'';
+    // The path code outranks utm_source: an Instagram share appends utm_source=ig to a partner's
+    // /enrique link, and the partner, not the channel, sent them (2026-10-17).
+    var code=params.get('ref')||params.get('via')||seg||params.get('utm_source')||'';
     // Codes are ours to issue, so anything unexpected is a typo or someone poking
     // at it - trimmed hard rather than trusted into a spreadsheet cell.
     code=code.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,40);
     code=REF_ALIASES[code]||code;
     if(!code) return;
-    if(readRef()) return;                    // first touch wins
+    // First touch wins between people. A CHANNEL code (the Instagram bio link's ig, the ads'
+    // meta-ads, fb, google) never outranks a person: Sam's own link opened in a browser that
+    // had once followed the bio link was writing "Ig" to the sheet (Sehaj, 2026-10-17). So a
+    // named partner or teammate replaces a stored channel; a channel never replaces anyone.
+    var stored=readRef();
+    if(stored){
+      var storedIsPerson=!!REF_NAMES[stored.code] && !CHANNEL_CODES[stored.code];
+      var newIsPerson=!!REF_NAMES[code] && !CHANNEL_CODES[code];
+      if(storedIsPerson || !newIsPerson) return;
+    }
     try{ localStorage.setItem(REF_KEY, JSON.stringify({
       code: code,
       at: Date.now(),
-      campaign: (params.get('utm_campaign')||'').trim().slice(0,60),
-      medium: (params.get('utm_medium')||'').trim().slice(0,40)
+      campaign: (params.get('utm_campaign')||params.get('campaign')||'').trim().slice(0,80),
+      medium: (params.get('utm_medium')||'').trim().slice(0,40),
+      // Meta fills these from the ad itself when the tracking string carries
+      // {{adset.name}} and {{ad.name}} (Sehaj, 2026-10-17: the sheet has a column for each).
+      adset: (params.get('utm_term')||params.get('adset')||'').trim().slice(0,80),
+      ad: (params.get('utm_content')||params.get('ad')||'').trim().slice(0,80)
     })); }catch(e){}
   }
   captureRef();
@@ -2196,7 +2220,6 @@ body.route-thanks .nav-cta{visibility:hidden}
   // What lands in the sheet is the readable form, because a column of lowercase
   // first names is something Sehaj would end up fixing by hand every week.
   // alex / sam / sehaj are the partners themselves (2026-09-30): attribution in the sheet only.
-  var REF_NAMES = { enrique: 'Enrique', zacrule: 'Zac Rule', alex: 'Alex', sam: 'Sam', sehaj: 'Sehaj', jp: 'JP Resin', teg: 'The Epoxy Group' };
 
   function refDisplayName(code){
     if(REF_NAMES[code]) return REF_NAMES[code];
@@ -2209,45 +2232,57 @@ body.route-thanks .nav-cta{visibility:hidden}
   }
   var liveMode = WEBAPP_URL.indexOf('http')===0;
 
-  function wlCached(){var v=parseInt(localStorage.getItem(WL_KEY),10);return (isNaN(v)||v<WL_BASE)?WL_BASE:v;}
+  function wlCached(){var v=NaN;try{v=parseInt(localStorage.getItem(WL_KEY),10)}catch(e){}return (isNaN(v)||v<WL_BASE)?WL_BASE:v;}
   function wlStore(n){try{localStorage.setItem(WL_KEY,n)}catch(e){}}
-  // rolls the displayed count up from whatever it currently shows to n (0 on
-  // first paint, since the element starts empty) rather than snapping - each
-  // call gets its own token so a fast update (e.g. the 20s poll) cancels any
-  // still-running animation on that element instead of the two fighting.
-  var wlTarget=null;
-  function wlShow(n){
-    n=Number(n); wlTarget=n;
-    document.querySelectorAll('[data-wl-count]').forEach(function(e){
-      var from=parseInt((e.textContent||'').replace(/,/g,''),10);
-      if(isNaN(from))from=0;
-      if(reduce||from===n){ e.textContent=n.toLocaleString(); return; }
-      var id=(e._wlAnimId=(e._wlAnimId||0)+1);
-      var start=performance.now(), dur=2200;
-      requestAnimationFrame(function tick(now){
-        if(e._wlAnimId!==id) return;
-        var t=Math.min(1,Math.max(0,(now-start)/dur));
-        var eased=1-Math.pow(1-t,3);
-        var lo=Math.min(from,n), hi=Math.max(from,n);
-        var val=Math.min(hi,Math.max(lo,Math.round(from+(n-from)*eased)));
-        e.textContent=val.toLocaleString();
-        if(t<1) requestAnimationFrame(tick);
-      });
-    });
+
+  // ONE continuous roll from 0, never a stop-start (Sehaj, 2026-10-21: "stalls at 30 something
+  // then continues"). The live count needs ~3s (the Apps Script /exec 302s before it answers),
+  // and the old roll ran to the cached guess in 2.2s, sat there, then started a second roll.
+  // Now there are two phases on one clock:
+  //  - waiting: the number climbs toward the guess on an exponential curve that slows but never
+  //    arrives, so it is always still moving when the live count lands;
+  //  - final: from wherever it is, at whatever speed it is going, a Hermite glide to the real
+  //    number that starts at the current speed and ends at rest. No jump in speed, no overshoot.
+  // Later changes (the 20s poll, the visitor's own signup) glide from rest the same way.
+  var wlTarget=null, wlVal=0, wlVel=0, wlPhase='waiting', wlT0=performance.now(), wlSeg=null, wlRaf=0;
+  var WL_TAU=1.4;   // seconds; at 3s the waiting curve is at 88% of the guess and still climbing
+  function wlPaint(v){
+    var t=Math.max(0,Math.round(v)).toLocaleString();
+    document.querySelectorAll('[data-wl-count]').forEach(function(e){ if(e.textContent!==t) e.textContent=t; });
   }
-  // Every visit rolls up from 0, returning visitors included (2026-09-23): the
-  // roll IS the effect, and painting a cached number straight away meant anyone
-  // who had been here before never saw it. The roll starts immediately against
-  // the cached number so it never waits on the network; if the live count that
-  // arrives differs, wlShow just re-targets the same animation. This used to
-  // animate to the hardcoded fallback on its own fixed 2.2s timer and only THEN
-  // fetch the live count - but the Apps Script endpoint 302s to its real execution
-  // URL before it responds (~3s round trip, measured), so the fallback animation
-  // routinely finished and sat still for a second or more before jumping to the
-  // real number. Outside live mode (preview/offline) no fetch is ever coming, so
-  // that path keeps its own animated fallback.
-  document.querySelectorAll('[data-wl-count]').forEach(function(e){ e.textContent='0'; });
-  wlShow(wlCached());
+  function wlFrame(now){
+    wlRaf=0;
+    var guess=wlCached();
+    if(wlPhase==='waiting'){
+      var t=(now-wlT0)/1000, k=Math.exp(-t/WL_TAU);
+      wlVal=guess*(1-k); wlVel=guess*k/WL_TAU;
+    } else if(wlSeg){
+      var s=Math.min(1,(now-wlSeg.t0)/(wlSeg.d*1000)), s2=s*s, s3=s2*s;
+      var a=wlSeg.p0, b=wlSeg.p1, m=wlSeg.v0*wlSeg.d;
+      wlVal=(2*s3-3*s2+1)*a+(s3-2*s2+s)*m+(-2*s3+3*s2)*b;
+      wlVel=((6*s2-6*s)*a+(3*s2-4*s+1)*m+(-6*s2+6*s)*b)/wlSeg.d;
+      if(s>=1){ wlVal=b; wlVel=0; wlSeg=null; }
+    }
+    wlPaint(wlVal);
+    if(wlPhase==='waiting' || wlSeg) wlRaf=requestAnimationFrame(wlFrame);
+  }
+  function wlKick(){ if(!wlRaf) wlRaf=requestAnimationFrame(wlFrame); }
+  function wlShow(n){
+    n=Number(n); if(isNaN(n)) return;
+    wlTarget=n;
+    if(reduce){ wlPhase='final'; wlSeg=null; wlVal=n; wlVel=0; wlPaint(n); return; }
+    var now=performance.now();
+    var from=wlVal, delta=n-from;
+    if(Math.abs(delta)<0.5 && wlPhase==='final'){ wlSeg=null; wlVal=n; wlPaint(n); return; }
+    // Longer glides for bigger gaps, so the speed stays in the same family as the roll.
+    var d=Math.min(2.2, Math.max(0.9, 0.9+Math.abs(delta)/60));
+    // Carry the current speed in, capped at 3x the average so the curve never overshoots.
+    var v0=delta>0 ? Math.min(Math.max(0,wlVel), 3*delta/d) : 0;
+    wlPhase='final'; wlSeg={ p0: from, p1: n, v0: v0, d: d, t0: now };
+    wlKick();
+  }
+  wlPaint(0);
+  if(reduce || !liveMode){ wlPhase='final'; wlShow(wlCached()); } else { wlKick(); }
 
   // #thanks badge: follows the same count the hero shows (it used to be a
   // hardcoded 18 that disagreed with the hero). Once this visitor signs up,
@@ -2266,10 +2301,8 @@ body.route-thanks .nav-cta{visibility:hidden}
   }
   refreshCount();
   if(liveMode) setInterval(refreshCount, 20000); // poll every 20s so it ticks up as others join
-  // Safety net for a slow/failed first fetch: 4s is comfortably past the normal
-  // ~3s round trip, so this is a no-op on a normal load and only rescues a
-  // visitor who'd otherwise stare at 0 with no backend response in sight.
-  if(liveMode) setTimeout(function(){ if(!wlGotLive && wlCached()!==wlTarget) wlShow(wlCached()); }, 4000);
+  // No answer by 6s: finish the roll on the remembered number rather than creeping forever.
+  if(liveMode) setTimeout(function(){ if(!wlGotLive && wlPhase==='waiting') wlShow(wlCached()); }, 6000);
 
   var form=document.getElementById('wlForm');
   if(form){
@@ -2328,10 +2361,16 @@ body.route-thanks .nav-cta{visibility:hidden}
       // updated yet simply ignores them and the signup still lands - the form
       // must never break because attribution changed.
       var ref=readRef();
+      // Every signup carries when and where (Sehaj, 2026-10-17: Date and Location columns).
+      payload.date=new Date().toISOString();
+      var flagOpt=country.options[country.selectedIndex];
+      payload.location=LOCATION_BY_FLAG[flagOpt ? flagOpt.getAttribute('data-flag') : '']||'';
       if(ref){
         payload.ref=refDisplayName(ref.code);
         if(ref.campaign) payload.campaign=ref.campaign;
         if(ref.medium) payload.medium=ref.medium;
+        if(ref.adset) payload.adset=ref.adset;
+        if(ref.ad) payload.ad=ref.ad;
         payload.refAt=new Date(ref.at).toISOString();
       }
 
@@ -2510,5 +2549,144 @@ header.nav,header.nav.scrolled{
     </div>
   </div>
 </footer>
+<script>
+// Behaviour tracking (Sehaj, 2026-10-18): section by section, where people stop, organic vs ads,
+// which ad set, which ad, by day. Events are batched and posted to Onyx
+// (/api/landing/events) where scripts/landing-report.py reads them back. Heatmaps and session
+// recordings are Microsoft Clarity's job, added separately once its project id exists.
+//
+// No PII leaves this script. A random visitor id (localStorage) and a per-tab session id
+// (sessionStorage) tie events together; the source fields are the same ones the waitlist
+// sheet gets (the stored ref code, campaign, ad set, ad). Everything is fire-and-forget: a
+// failure here can never touch the page or the signup.
+(function(){
+  var ENDPOINT='https://os.onyx-tech.ai/api/landing/events';
+  var LIVE=/(^|\.)onyx-tech\.ai$/.test(location.hostname) || /[?&]track=1\b/.test(location.search);
+  var t0=Date.now();
+  function rid(){ var s='', a='abcdefghijklmnopqrstuvwxyz0123456789'; for(var i=0;i<20;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
+  function store(kind,key){ try{ var v=kind.getItem(key); if(!v){ v=rid(); kind.setItem(key,v);} return v; }catch(e){ return rid(); } }
+  var vid=store(localStorage,'onyx_vid'), sid=store(sessionStorage,'onyx_sid');
+  var ref=null; try{ ref=JSON.parse(localStorage.getItem('onyx_ref')||'null'); }catch(e){}
+  var seg=(location.pathname.split('/').filter(Boolean)[0]||'').replace(/\.html$/,'');
+  var refHost=''; try{ refHost=document.referrer?new URL(document.referrer).hostname:''; }catch(e){}
+  if(/(^|\.)onyx-tech\.ai$/.test(refHost)) refHost='';
+  var ctx={ vid:vid, sid:sid, ref:ref&&ref.code||'', campaign:ref&&ref.campaign||'', adset:ref&&ref.adset||'', ad:ref&&ref.ad||'', medium:ref&&ref.medium||'',
+    path:seg, referrer:refHost, device: innerWidth<768?'mobile':(innerWidth<1024?'tablet':'desktop'), vw:innerWidth, vh:innerHeight, lang:(navigator.language||'').slice(0,12) };
+
+  var q=[], timer=null;
+  function send(){
+    if(!q.length) return;
+    var body=JSON.stringify({c:ctx,e:q.splice(0,60)});
+    if(!LIVE){ try{ console.debug('[track]',body); }catch(e){} return; }
+    try{
+      if(navigator.sendBeacon && navigator.sendBeacon(ENDPOINT,new Blob([body],{type:'text/plain;charset=utf-8'}))) return;
+    }catch(e){}
+    try{ fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body,keepalive:true}).catch(function(){}); }catch(e){}
+  }
+  function ev(n,s,l,v,m){
+    q.push({n:n,s:s||undefined,l:l||undefined,v:(v===undefined||v===null)?undefined:Math.round(v),m:m||undefined,t:Date.now()-t0});
+    if(q.length>=20) send(); else if(!timer) timer=setTimeout(function(){ timer=null; send(); },4000);
+  }
+
+  // The sections, in page order. #join and #thanks are routes, not scroll sections.
+  var sections=[].slice.call(document.querySelectorAll('section[id]')).filter(function(s){ return s.id!=='join'&&s.id!=='thanks'; });
+  var order={}; sections.forEach(function(s,i){ order[s.id]=i; });
+  var seen={}, shownAt={}, dwell={}, maxIdx=-1;
+  function vis(entry){
+    var h=entry.boundingClientRect.height||1;
+    return entry.isIntersecting && entry.intersectionRect.height >= 0.3*Math.min(h, innerHeight);
+  }
+  if('IntersectionObserver' in window){
+    var steps=[]; for(var i=0;i<=20;i++) steps.push(i/20);
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        var id=en.target.id, on=vis(en);
+        if(on && !shownAt[id]) shownAt[id]=Date.now();
+        if(!on && shownAt[id]){ dwell[id]=(dwell[id]||0)+(Date.now()-shownAt[id]); shownAt[id]=0; }
+        if(on && !seen[id]){ seen[id]=1; if(order[id]>maxIdx) maxIdx=order[id]; ev('section_view',id,null,order[id]); }
+      });
+    },{threshold:steps});
+    sections.forEach(function(s){ io.observe(s); });
+  }
+
+  // Scroll depth milestones, as a share of the whole page.
+  var depth=0, marks={25:0,50:0,75:0,100:0}, ticking=false;
+  function onScroll(){
+    if(ticking) return; ticking=true;
+    requestAnimationFrame(function(){
+      ticking=false;
+      var doc=document.documentElement, total=Math.max(1,doc.scrollHeight-innerHeight);
+      var pct=Math.min(100,Math.round((scrollY/total)*100));
+      if(pct>depth) depth=pct;
+      [25,50,75,100].forEach(function(m){ if(!marks[m] && depth>=m){ marks[m]=1; ev('scroll',null,null,m); } });
+      // A fling can pass a section between observer callbacks; a frame that has it on screen counts too.
+      sections.forEach(function(s){
+        if(seen[s.id]) return;
+        var r=s.getBoundingClientRect(); var shown=Math.min(r.bottom,innerHeight)-Math.max(r.top,0);
+        if(shown>=0.3*Math.min(r.height||1,innerHeight)){ seen[s.id]=1; if(order[s.id]>maxIdx) maxIdx=order[s.id]; ev('section_view',s.id,null,order[s.id]); }
+      });
+    });
+  }
+  addEventListener('scroll',onScroll,{passive:true});
+
+  // Buttons into the form, the calculator, the FAQ, any video.
+  document.addEventListener('click',function(e){
+    var a=e.target.closest && e.target.closest('a[href="#join"],button,summary');
+    if(!a) return;
+    var sec=a.closest('section'); var secId=sec?sec.id:'';
+    var label=(a.textContent||'').replace(/\s+/g,' ').trim().slice(0,60);
+    if(a.matches('a[href="#join"]')) ev('cta_click',secId,label);
+    else if(secId==='faq') ev('faq_open',secId,label);
+  },true);
+  var calcDone=false;
+  document.addEventListener('input',function(e){ if(!calcDone && e.target && e.target.closest && e.target.closest('#savings')){ calcDone=true; ev('calc_use','savings',e.target.id); } },true);
+  document.addEventListener('play',function(e){ if(e.target && e.target.tagName==='VIDEO'){ var s=e.target.closest('section'); ev('video_play',s?s.id:'',e.target.currentSrc?e.target.currentSrc.split('/').pop().slice(0,60):''); } },true);
+
+  // The routes: #join is the form page, #thanks is the win.
+  var routed={};
+  function route(){
+    var h=location.hash;
+    if(h==='#join' && !routed.join){ routed.join=1; ev('view_join',null,null,maxIdx); }
+    if(h==='#thanks' && !routed.thanks){ routed.thanks=1; ev('view_thanks'); send(); }
+  }
+  addEventListener('hashchange',route);
+
+  // The form: first touch, each field as it is left, the submit, and what blocked it.
+  var form=document.getElementById('wlForm');
+  if(form){
+    var started=false, fields={};
+    form.addEventListener('focusin',function(e){ if(!started){ started=true; ev('form_start'); } },true);
+    form.addEventListener('focusout',function(e){
+      var f=e.target; if(!f||!f.id||fields[f.id]) return;
+      fields[f.id]=1; ev('form_field',null,f.id,(f.value||'').trim()?1:0);
+    },true);
+    form.addEventListener('submit',function(){
+      ev('form_submit');
+      setTimeout(function(){
+        if(location.hash==='#thanks') return;
+        var f=document.activeElement, inForm=f && form.contains(f);
+        ev('form_error',null,inForm?f.id:'unknown');
+      },600);
+    },true);
+  }
+
+  // Leaving: total time, how far down, the furthest section, and the time spent in each.
+  var left=false;
+  function leave(){
+    if(left) return; left=true;
+    var now=Date.now();
+    for(var id in shownAt){ if(shownAt[id]){ dwell[id]=(dwell[id]||0)+(now-shownAt[id]); shownAt[id]=0; } }
+    for(var k in dwell){ if(dwell[k]>=500) ev('section_time',k,null,dwell[k]); }
+    ev('leave',maxIdx>=0?sections[maxIdx].id:'',location.hash.replace('#','')||'top',depth,{ms:now-t0,sections:Object.keys(seen).length});
+    send();
+  }
+  addEventListener('pagehide',leave);
+  document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden') leave(); else left=false; });
+
+  ev('page_view',null,location.hash.replace('#','')||'top',null,{w:screen.width,h:screen.height,q:location.search.slice(0,120)});
+  route();
+  send();
+})();
+</script>
 </body>
 </html>
