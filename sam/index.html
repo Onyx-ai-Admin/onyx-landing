@@ -209,6 +209,24 @@ body.route-join #top{display:none}
    plus the status-bar inset or the block lands low by half the nav */
 body.route-join .join-view{display:grid;place-items:center;min-height:100svh;padding:clamp(1rem,4vh,3rem) 0}
 body.route-join .nav-cta{visibility:hidden}
+/* Phones (Sehaj, 2026-10-21): the apply page is one screen. Logo centred in the nav row, Back
+   pinned top-left in that same row, the form centred in what is left below it, nothing scrolls.
+   min-height is the space under the nav, not 100svh, or the nav pushes the view past the fold. */
+html:has(body.route-join){overflow:hidden}
+@media (max-width:760px){
+  body.route-join .join-view{min-height:calc(100svh - 56px - env(safe-area-inset-top,0px));padding:.4rem 0 .9rem}
+  /* opacity only here: a transform on the parent would pin Back to it instead of the screen */
+  @keyframes joinFade{from{opacity:0}to{opacity:1}}
+  body.route-join .join-view .join-inner{animation-name:joinFade}
+  .join-back{position:fixed;top:calc(env(safe-area-inset-top,0px) + 28px);left:max(4vw,16px);transform:translateY(-50%);margin:0;z-index:60;padding:.5rem .25rem;font-size:.72rem}
+  .join-inner h1{font-size:1.8rem;margin-top:0;line-height:1.08}
+  .join-inner .lede{margin-top:.55rem;font-size:.94rem;line-height:1.45}
+  .join-inner .hero-form{margin-top:1.05rem;gap:.5rem}
+  .join-inner .hf-grid{gap:.5rem}
+  .join-inner .hero-form input,.join-inner .phone-field select{padding-top:.66rem;padding-bottom:.66rem}
+  .join-inner .hero-form .btn{padding-top:.75rem;padding-bottom:.75rem}
+  .join-inner .offer-line{margin-top:.75rem;font-size:.72rem;line-height:1.45}
+}
 .join-inner{width:min(560px,92vw);margin-inline:auto;text-align:center;display:flex;flex-direction:column;align-items:center;position:relative}
 .join-back{align-self:center;font-family:var(--mono);font-size:.74rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-decoration:none;margin-bottom:3.3rem}
 .join-back:hover{color:var(--text)}
