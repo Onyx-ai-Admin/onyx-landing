@@ -12,6 +12,13 @@
  *   number. Status and Plan are hand-kept (Sehaj, 2026-10-17); a new signup starts as
  *   Status "Waitlist" and Plan "N/a" so it reads like the rows around it.
  *
+ * WHERE A SIGNUP GOES (2026-10-21): the first row from the top with no Name and no Email, NOT
+ * appendRow. The tab is pre-numbered in column A (and pre-filled with Status/Plan) hundreds of
+ * rows down, so appendRow's "below the last row with anything in it" put every signup from
+ * 2026-10-20 at row 501+, out of sight under the list while the counter (which counts emails
+ * anywhere in the tab) still went up. Only the data columns (A up to the last known header)
+ * are written, so the summary table Sehaj keeps to the right is never touched.
+ *
  * DEPLOYING: Deploy > Manage deployments > the pencil on the existing deployment > Version:
  * New version > Deploy. That keeps the /exec URL the page already has. A brand-new
  * deployment gets a new URL and the page would keep posting to the old code.
@@ -90,6 +97,21 @@ function count_(sh) {
   return n;
 }
 
+/** 1-based row for the next signup: the first row below the header with no Name and no Email. */
+function nextRow_(sh, map) {
+  var lastRow = sh.getLastRow();
+  if (lastRow < 2) return 2;
+  var cols = [map.email, map.name].filter(function (c) { return c !== undefined; });
+  if (!cols.length) return lastRow + 1;
+  var width = Math.max.apply(null, cols) + 1;
+  var values = sh.getRange(2, 1, lastRow - 1, width).getValues();
+  for (var i = 0; i < values.length; i++) {
+    var taken = cols.some(function (c) { return String(values[i][c] || '').trim() !== ''; });
+    if (!taken) return i + 2;
+  }
+  return lastRow + 1;
+}
+
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -110,8 +132,22 @@ function doPost(e) {
     var when = payload.date ? new Date(payload.date) : new Date();
     if (isNaN(when.getTime())) when = new Date();
     var dateText = Utilities.formatDate(when, TIMEZONE, 'yyyy-MM-dd HH:mm');
+    var map = columnMap_(headers);
     var nextIndex = count_(sh) + 1;
-    sh.appendRow(buildRow(headers, payload, nextIndex, dateText));
+    var row = buildRow(headers, payload, nextIndex, dateText);
+    // Data columns only: A through the last column a known header maps to.
+    var width = 1;
+    for (var f in map) width = Math.max(width, map[f] + 1);
+    var target = nextRow_(sh, map);
+    var cells = row.slice(0, width);
+    // Keep anything pre-filled in a column this signup leaves blank (the row number in A, a
+    // Status dropdown), so the row reads like the ones around it.
+    var existing = target <= sh.getLastRow() ? sh.getRange(target, 1, 1, width).getValues()[0] : null;
+    if (existing) {
+      for (var i = 0; i < width; i++) if (cells[i] === '' && existing[i] !== '') cells[i] = existing[i];
+      if (!norm_(headers[0]) && existing[0] !== '') cells[0] = existing[0];   // the sheet's own row number wins
+    }
+    sh.getRange(target, 1, 1, width).setValues([cells]);
     return json_({ ok: true, count: count_(sh) });
   } finally {
     lock.releaseLock();
