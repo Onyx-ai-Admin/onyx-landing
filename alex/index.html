@@ -2167,7 +2167,15 @@ body.route-thanks .nav-cta{visibility:hidden}
         }
       })
     },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
-    document.querySelectorAll('.reveal, .card-reveal').forEach(function(e){io.observe(e)});
+    // The hero is the first screen, so it all comes in on load, top to bottom by where each piece
+    // actually sits (on phones the picture is between the copy and the count). It used to wait on
+    // the observer, whose -8% bottom margin never fired for the offer line once the phone layout
+    // put it in the last strip of the screen, so it stayed invisible until a scroll (2026-10-21).
+    var heroBits=[].slice.call(document.querySelectorAll('.hero .reveal, .hero .card-reveal'));
+    heroBits.map(function(e){ return {e:e, y:e.getBoundingClientRect().top}; })
+      .sort(function(a,b){ return a.y-b.y; })
+      .forEach(function(o,i){ setTimeout(function(){ o.e.classList.add('in'); }, 60+i*70); });
+    document.querySelectorAll('.reveal, .card-reveal').forEach(function(e){ if(!e.closest('.hero')) io.observe(e); });
     var hlIO=new IntersectionObserver(function(es){
       es.forEach(function(en){if(en.isIntersecting){setTimeout(function(){en.target.classList.add('lit')},180);hlIO.unobserve(en.target)}})
     },{threshold:.9});
