@@ -2495,9 +2495,17 @@ body.route-thanks .nav-cta{visibility:hidden}
   })();
 
   // routing: #join shows the separate lead-form "page", anything else shows the landing
+  // The home page always opens at the very top, logo row included (Sehaj, 2026-10-21). "#top" is
+  // <main>, which sits BELOW the nav, so /#top (what Back, the logo and Explore onyx leave in the
+  // address) jumped 57px down on every reload and hid the logo; Safari's own scroll restore did
+  // the same from wherever the visitor had been. Both are switched off for the home view, and
+  // #top is wiped from the address once it has been used.
+  try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(e){}
   function route(){
     var h=location.hash;
     var join = h==='#join', thanks = h==='#thanks';
+    if(h==='#top'){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} h=''; }
+    if(!h){ window.scrollTo(0,0); }
     document.body.classList.toggle('route-join', join);
     document.body.classList.toggle('route-thanks', thanks);
     if(join || thanks){ window.scrollTo(0,0); }
