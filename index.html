@@ -350,16 +350,23 @@ body.route-thanks .join-inner{animation:joinIn .45s ease both}
 .hero-phone-body{background:#fff;padding:2.4cqi;border-radius:13cqi;border:1px solid var(--line);
   box-shadow:0 30px 60px -18px rgba(15,23,42,.28),0 10px 24px -12px rgba(15,23,42,.18)}
 .hero-phone-screen{display:block;width:100%;height:auto;border-radius:10.8cqi}
-.hero-task{position:absolute;left:-15%;width:130%;display:flex;align-items:flex-start;gap:3.6cqi;background:#fff;
-  border:1px solid var(--line);border-radius:5.5cqi;padding:4.2cqi 4.6cqi;box-shadow:0 14px 30px -14px rgba(15,23,42,.30)}
-.hero-task-1{top:42%;border-color:color-mix(in srgb,var(--accent) 70%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent),0 16px 34px -14px rgba(15,23,42,.32)}
-.hero-task-2{top:58%;left:-9%;width:122%}
-.hero-task-3{top:74%;left:-9%;width:122%}
-.hero-task-tick{flex:none;width:7.6cqi;height:7.6cqi;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;margin-top:.4cqi}
-.hero-task-tick svg{width:62%;height:62%}
-.hero-task-text{min-width:0;text-align:left}
-.hero-task-title{margin:0;font-size:6.1cqi;font-weight:600;line-height:1.25;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hero-task-sub{margin:.8cqi 0 0;font-size:5.1cqi;line-height:1.3;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hero-task{position:absolute;left:-13%;width:126%;display:flex;align-items:flex-start;gap:3.4cqi;background:#fff;
+  border:1px solid var(--line);border-radius:5.5cqi;padding:4cqi 4.4cqi;box-shadow:0 14px 30px -14px rgba(15,23,42,.30)}
+.hero-task-1{top:44%;border-color:color-mix(in srgb,var(--accent) 70%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent),0 16px 34px -14px rgba(15,23,42,.32)}
+.hero-task-2{top:60%}
+.hero-task-3{top:76%}
+.hero-task-ico{flex:none;width:8.4cqi;height:8.4cqi;border-radius:2.4cqi;background:color-mix(in srgb,var(--accent) 12%,#fff);color:var(--accent);display:grid;place-items:center;margin-top:.2cqi}
+.hero-task-ico svg{width:62%;height:62%}
+.hero-task-text{min-width:0;flex:1;text-align:left}
+.hero-task-title{margin:0;font-size:6cqi;font-weight:600;line-height:1.25;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-task-sub{margin:.8cqi 0 0;font-size:5cqi;line-height:1.3;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hero-task-sub b{color:var(--text);font-weight:600}
+.hero-task-act{flex:none;align-self:center;font-size:5cqi;font-weight:600;color:#fff;background:var(--accent);border-radius:999px;padding:1.6cqi 3.6cqi}
+/* the Run my day pill, popped out over the phone's own button */
+.hero-pill{position:absolute;top:27.5%;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;gap:2.4cqi;white-space:nowrap;
+  background:var(--accent);color:#fff;font-weight:600;font-size:6.6cqi;padding:3.4cqi 6.4cqi;border-radius:999px;
+  box-shadow:0 0 0 3cqi color-mix(in srgb,var(--accent) 16%,transparent),0 16px 30px -12px color-mix(in srgb,var(--accent) 60%,transparent)}
+.hero-pill svg{width:1.1em;height:1.1em}
 @media (max-width:900px){
   .hero-grid2{grid-template-columns:1fr;width:min(640px,92vw)}
   .hero-copy{align-items:center;text-align:center}
@@ -379,12 +386,19 @@ body.route-thanks .join-inner{animation:joinIn .45s ease both}
   .hero-grid2{display:flex;flex-direction:column;align-items:center;text-align:center;gap:0}
   .hero-copy{display:contents}
   .hero-copy > *{order:1}
-  .hero-copy > .hero-pillars,.hero-copy > .wl-proof,.hero-copy > .hero-join,.hero-copy > .offer-line{order:3}
+  .hero-copy > .wl-proof,.hero-copy > .hero-join,.hero-copy > .offer-line{order:3}
+  /* the ticks move under the button so the count and Join now land on the first screen */
+  .hero-copy > .hero-pillars{order:4;margin-top:1.6rem}
+  .hero-copy .lede{margin-top:.9rem}
+  .hero-body{margin-top:.55rem}
+  .hero-copy .wl-proof{margin-top:0}
   /* the dashboard runs off the right edge, Kinso style, so it stays big enough to read */
   .hero{overflow-x:clip}
-  .hero-visual{order:2;width:100%;margin:2.4rem 0 4.4rem}
-  .hero-visual-frame{width:118%;margin-left:22%;border-radius:14px}
-  .hero-phone{width:36%;left:6%;bottom:-24%}
+  .hero-visual{order:2;width:100%;margin:1.2rem 0 2.15rem}
+  .hero-visual-frame{width:99%;margin-left:28%;border-radius:12px}
+  .hero-phone{width:29.5%;left:8%;bottom:-17%}
+  .hero{padding-top:1.4rem}
+  .hero-copy .hero-join{margin-top:.85rem;padding:.8rem 1.8rem}
 }
 
 /* ambient floating gradient blobs (brand blue + slate, very subtle) */
@@ -609,17 +623,19 @@ footer .fcol a:hover{opacity:1}
              real plan wording (components/dashboard/RunMyDay.tsx verb()), from the Essence demo. -->
         <div class="hero-phone card-reveal">
           <div class="hero-phone-body"><img src="assets/hero/workbench-iphone-2026-10.webp" width="780" height="1688" alt="Onyx on a phone: the Workbench, ready to run Alex's day" class="hero-phone-screen"></div>
+          <span class="hero-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>Onyx, run my day</span>
           <div class="hero-task hero-task-1">
-            <span class="hero-task-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
-            <div class="hero-task-text"><p class="hero-task-title">Send Aisha Bello the final invoice</p><p class="hero-task-sub">$2,362 balance, emailed in your final payment design</p></div>
+            <span class="hero-task-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span>
+            <div class="hero-task-text"><p class="hero-task-title">Quote built for Craig Nolan</p><p class="hero-task-sub">156 m&sup2; flake, St Marys. <b>$14,040.</b> Send now?</p></div>
+            <span class="hero-task-act">Send</span>
           </div>
           <div class="hero-task hero-task-2">
-            <span class="hero-task-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
-            <div class="hero-task-text"><p class="hero-task-title">Email Craig Nolan</p><p class="hero-task-sub">Hi Craig, just checking in on the $14,040 quote for St Marys.</p></div>
+            <span class="hero-task-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="m9 15 2 2 4-4"/></svg></span>
+            <div class="hero-task-text"><p class="hero-task-title">Job booked: Sam Okafor</p><p class="hero-task-sub">Polished concrete, Blacktown. Thu 23 Oct, 7am. Crew told.</p></div>
           </div>
           <div class="hero-task hero-task-3">
-            <span class="hero-task-tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
-            <div class="hero-task-text"><p class="hero-task-title">Reply to Connor Reynolds</p><p class="hero-task-sub">Hi Connor, thanks for reaching out. Happy to come and measure up.</p></div>
+            <span class="hero-task-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span>
+            <div class="hero-task-text"><p class="hero-task-title">Reply ready for Connor Reynolds</p><p class="hero-task-sub">&ldquo;Hi Connor, thanks for reaching out! Happy to come measure up this week.&rdquo;</p></div>
           </div>
         </div>
       </div>
