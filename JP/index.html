@@ -2633,7 +2633,10 @@ header.nav,header.nav.scrolled{
 // failure here can never touch the page or the signup.
 (function(){
   var ENDPOINT='https://os.onyx-tech.ai/api/landing/events';
-  var LIVE=/(^|\.)onyx-tech\.ai$/.test(location.hostname) || /[?&]track=1\b/.test(location.search);
+  // Automated browsers (navigator.webdriver: Playwright, Selenium, headless checks) never count
+  // (2026-10-21): a day of Claude's own live checks was 145 of 160 sessions in the report. A real
+  // end-to-end test can still opt in with ?track=1, and should tag itself with ?ref=qa-test.
+  var LIVE=(/(^|\.)onyx-tech\.ai$/.test(location.hostname) && !navigator.webdriver) || /[?&]track=1\b/.test(location.search);
   var t0=Date.now();
   function rid(){ var s='', a='abcdefghijklmnopqrstuvwxyz0123456789'; for(var i=0;i<20;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
   function store(kind,key){ try{ var v=kind.getItem(key); if(!v){ v=rid(); kind.setItem(key,v);} return v; }catch(e){ return rid(); } }
