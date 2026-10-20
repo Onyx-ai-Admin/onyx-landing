@@ -2292,12 +2292,20 @@ body.route-thanks .nav-cta{visibility:hidden}
   wlSyncPos(wlCached());
 
   var wlGotLive=false;
+  // The count comes from Onyx first: it asks the sheet on the server and the CDN keeps the
+  // answer, so it lands in ~100ms instead of the sheet's own 2-6s (2026-10-21). The sheet is
+  // asked directly only if Onyx does not answer, so the counter never depends on Onyx being up.
+  var COUNT_FAST='https://os.onyx-tech.ai/api/landing/waitlist-count';
+  function gotCount(d){ if(d && typeof d.count==='number'){ wlGotLive=true; wlStore(d.count); if(d.count!==wlTarget) wlShow(d.count); wlSyncPos(d.count); return true; } return false; }
+  function fromSheet(){ return fetch(WEBAPP_URL,{method:'GET'}).then(function(r){return r.json()}).then(gotCount).catch(function(){}); }
   function refreshCount(){
     if(!liveMode) return;
-    fetch(WEBAPP_URL,{method:'GET'})
-      .then(function(r){return r.json()})
-      .then(function(d){ if(d && typeof d.count==='number'){ wlGotLive=true; wlStore(d.count); if(d.count!==wlTarget) wlShow(d.count); wlSyncPos(d.count); } })
-      .catch(function(){});
+    var ctl=window.AbortController ? new AbortController() : null;
+    var timer=ctl ? setTimeout(function(){ ctl.abort(); }, 2500) : 0;
+    fetch(COUNT_FAST,{method:'GET',signal:ctl?ctl.signal:undefined})
+      .then(function(r){ clearTimeout(timer); return r.ok ? r.json() : null; })
+      .then(function(d){ if(!gotCount(d)) return fromSheet(); })
+      .catch(function(){ clearTimeout(timer); return fromSheet(); });
   }
   refreshCount();
   if(liveMode) setInterval(refreshCount, 20000); // poll every 20s so it ticks up as others join
@@ -2662,8 +2670,11 @@ header.nav,header.nav.scrolled{
     },true);
     form.addEventListener('submit',function(){
       ev('form_submit');
+      // Only a message the visitor can see is an error. A valid submit waits ~3s on the sheet,
+      // so "not on #thanks yet" logged every good signup as an error (2026-10-21).
       setTimeout(function(){
-        if(location.hash==='#thanks') return;
+        var msg=document.getElementById('formError');
+        if(location.hash==='#thanks' || !msg || msg.hidden) return;
         var f=document.activeElement, inForm=f && form.contains(f);
         ev('form_error',null,inForm?f.id:'unknown');
       },600);
