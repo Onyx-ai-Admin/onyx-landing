@@ -201,18 +201,19 @@ header.nav.scrolled{border-bottom-color:var(--line)}
 
 /* separate lead-form "page" (routed via #join), same design system */
 .join-view{display:none;position:relative;z-index:1}
-/* apply page is a fixed full-screen view — no scrolling */
-body.route-join{overflow:hidden;height:100svh}
+/* The apply page is laid out to fit one screen, but it is NEVER locked: on a real phone the
+   keyboard covers the lower half, and a locked page left the Claim button unreachable under it
+   (2026-10-21, people stuck on the form). It scrolls only when something is in the way. */
 .join-view,.thanks-view{padding-bottom:env(safe-area-inset-bottom,0px)}
 body.route-join #top{display:none}
+body.route-join .site-foot{display:none}
 /* centred on the full viewport: nav sits in flow above, so pull up by its height
    plus the status-bar inset or the block lands low by half the nav */
-body.route-join .join-view{display:grid;place-items:center;min-height:100svh;padding:clamp(1rem,4vh,3rem) 0}
+body.route-join .join-view{display:grid;place-items:center;min-height:calc(100svh - 65px);padding:clamp(1rem,4vh,3rem) 0}
 body.route-join .nav-cta{visibility:hidden}
 /* Phones (Sehaj, 2026-10-21): the apply page is one screen. Logo centred in the nav row, Back
    pinned top-left in that same row, the form centred in what is left below it, nothing scrolls.
    min-height is the space under the nav, not 100svh, or the nav pushes the view past the fold. */
-html:has(body.route-join){overflow:hidden}
 @media (max-width:760px){
   body.route-join .join-view{min-height:calc(100svh - 56px - env(safe-area-inset-top,0px));padding:.4rem 0 .9rem}
   /* opacity only here: a transform on the parent would pin Back to it instead of the screen */
@@ -2107,8 +2108,8 @@ body.route-thanks .nav-cta{visibility:hidden}
     <p class="lede">We're rolling out onyx gradually starting October 2026. Join the waitlist for exclusive, invite-only access.</p>
     <form class="hero-form" id="wlForm" novalidate>
       <div class="hf-grid">
-        <input type="text" id="wlName" required autocomplete="name" placeholder="Your name" aria-label="Your name">
-        <input type="text" id="wlBiz" required autocomplete="organization" placeholder="Business name" aria-label="Business name">
+        <input type="text" id="wlName" required autocomplete="name" enterkeyhint="next" placeholder="Your name" aria-label="Your name">
+        <input type="text" id="wlBiz" required autocomplete="organization" enterkeyhint="next" placeholder="Business name" aria-label="Business name">
         <div class="phone-field" id="wlPhoneField">
           <select id="wlCountry" aria-label="Country calling code">
             <option value="+61" data-flag="🇦🇺" data-len="9" data-hint="0412 345 678" selected>🇦🇺 +61</option>
@@ -2116,9 +2117,9 @@ body.route-thanks .nav-cta{visibility:hidden}
             <option value="+1"  data-flag="🇺🇸" data-len="10" data-hint="(555) 123 4567">🇺🇸 +1</option>
             <option value="+1"  data-flag="🇨🇦" data-len="10" data-hint="(416) 123 4567">🇨🇦 +1</option>
           </select>
-          <input type="tel" id="wlPhone" required autocomplete="tel" placeholder="0412 345 678" aria-label="Phone number" inputmode="tel">
+          <input type="tel" id="wlPhone" required autocomplete="tel" enterkeyhint="next" placeholder="0412 345 678" aria-label="Phone number" inputmode="tel">
         </div>
-        <input type="email" id="wlEmail" required autocomplete="email" placeholder="you@yourcompany.com" aria-label="Email address">
+        <input type="email" id="wlEmail" required autocomplete="email" enterkeyhint="go" placeholder="you@yourcompany.com" aria-label="Email address">
       </div>
       <button class="btn btn-primary" type="submit">CLAIM 50% OFF FOR LIFE</button>
     </form>
@@ -2368,6 +2369,8 @@ body.route-thanks .nav-cta{visibility:hidden}
   // No answer by 6s: finish the roll on the remembered number rather than creeping forever.
   if(liveMode) setTimeout(function(){ if(!wlGotLive && wlPhase==='waiting') wlShow(wlCached()); }, 6000);
 
+  // What happened to a signup, told to the tracker below (stage + timings only, never the answers).
+  function wlSignal(stage,d){ try{ document.dispatchEvent(new CustomEvent('onyx-wl',{detail:Object.assign({stage:stage},d||{})})); }catch(e){} }
   var form=document.getElementById('wlForm');
   if(form){
     form.addEventListener('submit',function(ev){
@@ -2414,7 +2417,14 @@ body.route-thanks .nav-cta{visibility:hidden}
       var badDomains=['test.com','example.com','mailinator.com','tempmail.com','guerrillamail.com','10minutemail.com','yopmail.com','trashmail.com'];
       if(emailOk && badDomains.indexOf(emailVal.split('@')[1])>-1) emailOk=false;
       if(!emailOk) bad(email,'Enter a valid email address.');
-      if(firstBad){ errEl.textContent=msg; errEl.hidden=false; firstBad.focus(); return; }
+      if(firstBad){
+        errEl.textContent=msg; errEl.hidden=false;
+        // Bring the message into view (on a phone it can sit under the keyboard), then the field.
+        try{ errEl.scrollIntoView({block:'center'}); }catch(e){}
+        firstBad.focus();
+        wlSignal('invalid',{field:firstBad.id,msg:msg});
+        return;
+      }
       errEl.hidden=true;
       var btn=form.querySelector('button');
       if(btn){ btn.disabled=true; btn.textContent='Joining…'; }
@@ -2438,7 +2448,9 @@ body.route-thanks .nav-cta{visibility:hidden}
         payload.refAt=new Date(ref.at).toISOString();
       }
 
+      var sentAt=Date.now(), done=false;
       function finish(n){                       // success → thanks page
+        if(done) return; done=true;
         wlStore(n); wlShow(n);
         var p=document.getElementById('wlPos'); if(p) p.textContent=Number(n).toLocaleString();
         wlJoined=true;
@@ -2446,6 +2458,7 @@ body.route-thanks .nav-cta{visibility:hidden}
         if(btn){ btn.disabled=false; btn.textContent='CLAIM 50% OFF FOR LIFE'; }
       }
       function fail(m){
+        if(done) return; done=true;
         if(btn){ btn.disabled=false; btn.textContent='CLAIM 50% OFF FOR LIFE'; }
         errEl.textContent=m||'Something went wrong. Please try again.'; errEl.hidden=false;
       }
@@ -2466,17 +2479,28 @@ body.route-thanks .nav-cta{visibility:hidden}
       }
 
       if(liveMode){
+        // Never leave anyone on "Joining…": the sheet writes the row on the first request, so a
+        // slow or lost answer (in-app browsers, bad signal) still ends on the thanks page.
+        var ctl=('AbortController' in window)?new AbortController():null;
+        var slow=setTimeout(function(){ if(ctl) ctl.abort(); wlSignal('timeout',{ms:Date.now()-sentAt}); finish(wlCached()+1); },15000);
         fetch(WEBAPP_URL,{
           method:'POST',
           headers:{'Content-Type':'text/plain;charset=utf-8'}, // "simple" request = no CORS preflight
-          body:JSON.stringify(payload)
+          body:JSON.stringify(payload),
+          signal:ctl?ctl.signal:undefined
         })
         .then(function(r){return r.json()})
         .then(function(d){
-          if(d && d.ok===false){ email.setAttribute('aria-invalid','true'); fail('That email didn’t look valid. Please check it.'); return; }
+          clearTimeout(slow);
+          if(d && d.ok===false){ wlSignal('refused',{ms:Date.now()-sentAt}); email.setAttribute('aria-invalid','true'); fail('That email didn’t look valid. Please check it.'); return; }
+          wlSignal('ok',{ms:Date.now()-sentAt});
           finish(d && typeof d.count==='number' ? d.count : wlCached()+1);
         })
-        .catch(function(){ finish(wlCached()+1); }); // preview/offline — optimistic
+        .catch(function(err){
+          clearTimeout(slow);
+          if(!done) wlSignal('neterror',{ms:Date.now()-sentAt,err:String(err&&err.name||'error').slice(0,40)});
+          finish(wlCached()+1);
+        }); // preview/offline — optimistic
       } else {
         finish(wlCached()+1);
       }
@@ -2519,11 +2543,15 @@ body.route-thanks .nav-cta{visibility:hidden}
     if(join || thanks){ window.scrollTo(0,0); }
     if(join){
       var n=document.getElementById('wlName');
-      if(n){ setTimeout(function(){ n.focus(); }, 90); }
+      // preventScroll: the page may scroll now (for the phone keyboard), so a plain focus or the
+      // browser's own jump to #join would push the logo row off the top.
+      if(n){ setTimeout(function(){ try{ n.focus({preventScroll:true}); }catch(e){ n.focus(); } window.scrollTo(0,0); }, 90); }
     }
   }
   window.addEventListener('hashchange', route);
   route();
+  // Opened straight on /#join: the browser jumps to the anchor after load; put the page back on top.
+  window.addEventListener('load', function(){ if(location.hash==='#join') window.scrollTo(0,0); });
 
   // route reliably on click (don't depend on hashchange alone in sandboxed frames)
   document.querySelectorAll('a[href^="#"]').forEach(function(a){
@@ -2735,17 +2763,18 @@ header.nav,header.nav.scrolled{
       var f=e.target; if(!f||!f.id||fields[f.id]) return;
       fields[f.id]=1; ev('form_field',null,f.id,(f.value||'').trim()?1:0);
     },true);
-    form.addEventListener('submit',function(){
-      ev('form_submit');
-      // Only a message the visitor can see is an error. A valid submit waits ~3s on the sheet,
-      // so "not on #thanks yet" logged every good signup as an error (2026-10-21).
-      setTimeout(function(){
-        var msg=document.getElementById('formError');
-        if(location.hash==='#thanks' || !msg || msg.hidden) return;
-        var f=document.activeElement, inForm=f && form.contains(f);
-        ev('form_error',null,inForm?f.id:'unknown');
-      },600);
-    },true);
+    // Each press of the button; what stopped it, or how the sheet answered, arrives below.
+    form.addEventListener('submit',function(){ ev('form_submit'); },true);
+    // The outcome of each signup (2026-10-21, after people got stuck on the form): which field
+    // stopped it, or how the sheet answered and how long it took. Stages: invalid, ok, refused,
+    // neterror, timeout. Sent at once, so a visitor who gives up still leaves the reason behind.
+    document.addEventListener('onyx-wl',function(e){
+      var d=e.detail||{};
+      if(d.stage==='invalid') ev('form_error',null,d.field||'unknown',null,{stage:'invalid',msg:String(d.msg||'').slice(0,80)});
+      else if(d.stage==='ok') ev('form_submit',null,'sheet_ok',d.ms,{stage:'ok'});
+      else ev('form_error',null,'sheet',d.ms,{stage:d.stage,err:d.err||''});
+      send();
+    });
   }
 
   // Leaving: total time, how far down, the furthest section, and the time spent in each.
